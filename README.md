@@ -22,6 +22,15 @@ Zero-Config Install and Run
 
 You can start working with test user data immediately.
 
+0-Step Install
+----------------
+
+This script will complete the steps below as well as print out what you need to do next.
+
+```bash
+curl -fsSL https://bit.ly/install-facecards-dev | bash
+```
+
 1. Clone Backend
 ----------------
 
