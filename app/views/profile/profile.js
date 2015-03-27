@@ -9,10 +9,22 @@ angular.module('myApp.profile', ['ngRoute'])
   });
 }])
 
-.controller('ProfileCtrl', [ 'MyAppSession', function(MyAppSession) {
+.controller('ProfileCtrl', [ 'MyAppSession', function (MyAppSession) {
   var MP = this
     ;
 
   // sharing session data between the service
   MP.session = MyAppSession.session;
+  MyAppSession.getProfile().then(function (profile) {
+    console.info('profile');
+    console.log(profile);
+    var photoUrl = 'https://lds.io/api/ldsio/'
+      + MP.session.id + '/photos/individual/'
+      + profile.individual_id + '/medium/'
+      + profile.name + '.jpg'
+      ;
+
+    MP.profile = profile;
+    MP.headshot = profile.photos[0] && photoUrl;
+  });
 }]);

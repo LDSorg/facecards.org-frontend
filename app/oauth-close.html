@@ -1,19 +1,17 @@
 <script>
-  var re = /\/auth\/([^\/]+)\/callback/
-    , href = window.location.href
-    , m
-    , name
-    ;
-
-  m = href.match(re);
-  name = m[1]
+  var re = /\/(auth|providers)\/([^\/]+)\/callback/;
+  var href = window.location.href;
+  var m = href.match(re);
+  var name;
 
   if (!m) {
-    window.alert("callback URLs should be in the format /auth/{{strategy}}/callback");
+    window.alert("callback URLs should be in the format /providers/{{strategy}}/callback");
   }
 
+  name = m[1]
+
   setTimeout(function () {
-    window.opener.completeLogin(name, window.location.href);
+    (window.opener||window.parent).completeLogin(name, window.location.href);
   }, 100);
 
   // iOS Webview (namely Chrome) workaround
@@ -23,6 +21,10 @@
   }, 300);
 
   localStorage.setItem(name + 'Status', window.location.href);
+
+  setTimeout(function () {
+    localStorage.removeItem(name + 'Status');
+  }, 1000);
 </script>
 
 <p>Redirecting... </p>
