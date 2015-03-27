@@ -22,6 +22,7 @@ angular.module('myApp.profile', ['ngRoute'])
       + MP.session.id + '/photos/individual/'
       + profile.individual_id + '/medium/'
       + profile.name + '.jpg'
+      + '?access_token=' + MP.session.token
       ;
 
     MP.profile = profile;

@@ -79,7 +79,9 @@ angular
 
       if (result) {
         if (!usable) {
-          return doGet();
+          return doGet().then(function () {
+            return { updated: caches[id], value: result, stale: false };
+          });
         } else {
           return $q.when({ updated: caches[id], value: result, stale: !fresh });
         }
