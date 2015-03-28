@@ -2,6 +2,8 @@
 set -e
 set -u
 
+FC_FRONTEND_DIR=""
+
 #curl -fsSL https://bit.ly/install-facecards-dev | bash
 
 echo "Cloning Frontend-Developer NoBackend (https static file server)..."
@@ -25,6 +27,8 @@ echo "Installing Bower Components... (this will take several seconds, maybe a mi
 pushd ./frontend > /dev/null
 bower install --silent > /dev/null
 #jade app/**/*.jade
+FC_FRONTEND_DIR="$(pwd)"
+popd
 
 echo ""
 echo ""
@@ -42,14 +46,22 @@ echo ""
 #echo ""
 #echo ""
 
-echo "Open up yet another new tab and run the server like so:"
+echo "1. Open up a new tab and run the server like so:"
 echo ""
 echo "    pushd" "$(pwd)"
 echo "    node ./serve.js"
 echo ""
 echo ""
 
-echo "Open up your web browser and fire it up to the project:"
+echo "2. Open up a new tab and run the server like so:"
+echo ""
+echo "    pushd" "$FC_FRONTEND_DIR"
+echo "    ls
+echo ""
+echo "  This is where you can edit files to your heart's content"
+echo ""
+
+echo "3. Open up your web browser and fire it up to the project:"
 echo ""
 echo "    https://local.ldsconnect.org:8043"
 echo ""
