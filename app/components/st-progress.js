@@ -166,14 +166,23 @@ angular.module('steve.progress', [])
     Progress.stop = function (time) {
       console.log('stopping progress');
       var me = this;
+      var wait = time >= 100;
       me.scope.progress = 100; // total %
       $timeout.cancel(me._timer);
       $timeout.cancel(me._timer2);
-      return $timeout(function () {
+
+      function disappear() {
         me._started = 0;
         me.scope.progress = 0; // total %
         me.scope.message = '';
-      }, (time || 0) + 250);
+      }
+
+      if (wait) {
+        return $timeout(disappear, (time || 0));
+      } else {
+        disappear();
+        return $timeout(function () {});
+      }
     };
     Progress.subscribe = function (fn) {
       d.then(null, null, fn);
