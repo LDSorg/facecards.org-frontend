@@ -9,11 +9,19 @@ angular.module('myApp', [
   'myApp.session',
   'myApp.progress',
   'steve.progress'
-]).
-config(['$routeProvider', function($routeProvider) {
+])
+.config(['$routeProvider', function($routeProvider) {
   $routeProvider.otherwise({ redirectTo: '/' });
   //$routeProvider.otherwise({ redirectTo: '/profile' });
-}]);
+}])
+.config(['$routeProvider', function($routeProvider) {
+  var tpl = $('st-view-splash').html();
+  $('st-view-splash').html('');
+  $routeProvider.when('/', {
+    template: tpl
+  });
+}])
+;
 
 angular.module('myApp').controller('MyNavCtrl', [
     '$scope'
