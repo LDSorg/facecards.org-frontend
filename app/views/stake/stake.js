@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('myApp.directory', ['ngRoute'])
+angular.module('myApp.stake', ['ngRoute'])
 
 .config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/stake', {

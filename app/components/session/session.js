@@ -10,7 +10,7 @@ angular
   , '$http'
   , 'StApiCache'
   , function StSession($window, $rootScope, $timeout, $q, $http, StApiCache) {
-    var session = {};
+    var shared = { session: {} };
     var providerBase = 'https://lds.io';
     var apiPrefix = providerBase + '/api/ldsio';
     var myAppDomain = 'https://local.ldsconnect.org:8043';
@@ -24,16 +24,24 @@ angular
     }
 
     function restore() {
-      session = JSON.parse(localStorage.getItem('io.lds.session') || null) || {};
-      if (session.token) {
-        return $q.when(session);
+      if (shared.session.token) {
+        return $q.when(shared.session);
+      }
+
+      shared.session = JSON.parse(localStorage.getItem('io.lds.session') || null) || {};
+      if (shared.session.token) {
+        return $q.when(shared.session);
       } else {
         return $q.reject(new Error("No Session"));
       }
     }
 
     function destroy() {
-      session = {};
+      if (!shared.session.token) {
+        return $q.when(shared.session);
+      }
+
+      shared.session = {};
       localStorage.removeItem('io.lds.session');
       return StApiCache.destroy().then(function (session) {
         return session;
@@ -52,10 +60,22 @@ angular
         // TODO accounts should be an object
         // (so that the type doesn't change on error)
         if (!Array.isArray(accounts) || accounts.error) { 
+          console.error("ERR acc", accounts);
           return $q.reject(new Error("could not verify session")); // destroy();
         }
 
-        id = accounts[0].appScopedId || accounts[0].id;
+        if (1 !== accounts.length) {
+          console.error("SCF acc.length", accounts.length);
+          return $q.reject(new Error("[SANITY CHECK FAILED] number of accounts: '" + accounts.length + "'"));
+        }
+
+        id = accounts[0].app_scoped_id || accounts[0].id;
+
+        if (!id) {
+          console.error("SCF acc[0].id", accounts);
+          return $q.reject(new Error("[SANITY CHECK FAILED] could not get account id"));
+        }
+
         session.id = id;
 
         return session;
@@ -102,8 +122,9 @@ angular
         $window.completeLogin = null;
 
         parseLogin(name, url).then(function (token) {
-          session.token = token;
-          return testToken(session).then(save).then(d.resolve, d.reject);
+          shared.session.token = token;
+          // TODO rid token on reject
+          return testToken(shared.session).then(save).then(d.resolve, d.reject);
         });
       };
 
@@ -162,38 +183,42 @@ angular
 
     function requireSession() {
       return restore().then(function (session) {
-        if (session.token) {
-          return session;
-        } else {
-          // TODO how to properly get callback from modal?
-          $rootScope.rootShowLoginModal = true;
-          $rootScope.rootLoginPromise = $q.defer();
-          $timeout(function () {
-            $rootScope.rootShowLoginModalFull = true;
-          }, 0);
+        return session;
+      }, function (/*err*/) {
+        // TODO how to properly get callback from modal?
+        $rootScope.rootShowLoginModal = true;
+        $rootScope.rootLoginPromise = $q.defer();
+        $timeout(function () {
+          $rootScope.rootShowLoginModalFull = true;
+        }, 0);
 
-          return $rootScope.loginPromise;
-        }
+        return $rootScope.loginPromise;
       });
     }
 
     function checkSession() {
-      return restore().then(function (session) {
-        if (session.token) {
-          return session;
-        } else {
-          return $q.reject(new Error("no session"));
+      return restore();
+    }
+
+    function onLogin(_scope, fn) {
+      // This is better than using a promise.notify
+      // because the watches will unwatch when the controller is destroyed
+      _scope.__stsessionshared__ = shared;
+      _scope.$watch('__stsessionshared__.session', function () {
+        if (shared.session.token) {
+          fn(shared.session);
         }
-      });
+      }, true);
     }
 
-    /*
-    function onLogin($scope, fn) {
+    function onLogout(_scope, fn) {
+      _scope.__stsessionshared__ = shared;
+      _scope.$watch('__stsessionshared__.session', function () {
+        if (!shared.session.token) {
+          fn(shared.session);
+        }
+      }, true);
     }
-
-    function onLogout($scope, fn) {
-    }
-    */
 
     init();
 
@@ -202,8 +227,8 @@ angular
     , destroy: destroy
     , login: login
     , logout: logout
-    //, onLogin: onLogin
-    //, onLogout: onLogout
+    , onLogin: onLogin
+    , onLogout: onLogout
     , checkSession: checkSession
     , requireSession: requireSession
     };

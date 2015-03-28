@@ -6,6 +6,7 @@ angular.module('myApp', [
   'myApp.version',
   'myApp.profile',
   'myApp.directory',
+  'myApp.stake',
   'myApp.cache',
   'myApp.api',
   'myApp.login',

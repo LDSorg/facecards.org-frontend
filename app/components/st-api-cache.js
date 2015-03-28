@@ -21,7 +21,7 @@ angular
 
     function apiCall(id, url, fetch, opts) {
       var refreshWait = (15 * 60 * 1000);
-      var uselessAt = (30 * 24 * 60 * 60 * 1000);
+      var uselessWait = Infinity; //(30 * 24 * 60 * 60 * 1000);
       var fresh;
       var usable;
       var result;
@@ -36,8 +36,8 @@ angular
 
       if (caches[id] && !(opts && opts.expire)) {
         now = Date.now();
-        usable = now - caches[id] < refreshWait;
-        fresh = now - caches[id] < uselessAt;
+        usable = now - caches[id] < uselessWait;
+        fresh = now - caches[id] < refreshWait;
         if (!fresh) {
           fetch().then(fin);
         }
