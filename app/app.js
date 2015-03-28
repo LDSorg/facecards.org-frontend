@@ -6,10 +6,14 @@ angular.module('myApp', [
   'myApp.version',
   'myApp.profile',
   'myApp.directory',
+  'myApp.cache',
+  'myApp.api',
+  'myApp.login',
   'myApp.session'
 ]).
 config(['$routeProvider', function($routeProvider) {
-  $routeProvider.otherwise({ redirectTo: '/profile' });
+  $routeProvider.otherwise({ redirectTo: '/' });
+  //$routeProvider.otherwise({ redirectTo: '/profile' });
 }]);
 
 angular.module('myApp').controller('MyNavCtrl', [
@@ -18,7 +22,8 @@ angular.module('myApp').controller('MyNavCtrl', [
   , '$window'
   , '$http'
   , 'MyAppSession'
-  , function ($scope, $timeout, $window, $http, MyAppSession) {
+  , 'LdsIoApi'
+  , function ($scope, $timeout, $window, $http, MyAppSession, LdsIoApi) {
 
   var MNC = this;
 
@@ -27,7 +32,9 @@ angular.module('myApp').controller('MyNavCtrl', [
   });
 
   MNC.login = function (/*name*/) {
-    MyAppSession.login();
+    MyAppSession.login().then(function () {
+      return LdsIoApi.profile({ expire: true });
+    });
   };
 
   MNC.logout = function (/*name*/) {

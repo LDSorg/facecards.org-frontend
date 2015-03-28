@@ -22,9 +22,10 @@
     <li><a href="#/view2">view2</a></li>
   </ul -->
   <div class="container">
-    <nav ng-controller="MyNavCtrl as MNC" class="navbar navbar-default">
-      <div ng-if="MNC.show" class="modal-backdrop fade" style="height: 100%; position: fixed;" ng-class="{ in: MNC.showAnimate }"></div>
-      <div ng-if="MNC.show" role="dialog" class="modal fade" ng-style="{ 'display': MNC.show && 'block' }" ng-class="{ in: MNC.showAnimate }">
+    <!-- root login modal -->
+    <div ng-controller="MyLoginCtrl as MLC">
+      <div ng-if="rootShowLoginModal" class="modal-backdrop fade" style="height: 100%; position: fixed;" ng-class="{ in: rootShowLoginModalFull }"></div>
+      <div ng-if="rootShowLoginModal" role="dialog" class="modal fade" ng-style="{ 'display': rootShowLoginModal && 'block' }" ng-class="{ in: rootShowLoginModalFull }">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
@@ -32,24 +33,20 @@
             </div>
             <div class="modal-body">
               <button
-                ng-click="MNC.login('ldsconnect')"
+                ng-click="MLC.login('ldsconnect')"
                 type="button"
                 class="btn btn-primary"
                 >LDS Connect</button>
-              <button 
-                ng-click="MNC.login('facebook')"
-                type="button"
-                class="btn btn-primary"
-                >Facebook Connect</button>
             </div>
             <div class="modal-footer ng-scope">
-                <button class="btn btn-default" ng-click="MNC.openLogin()">Cancel</button>
+                <button class="btn btn-default" ng-click="MLC.cancel()">Cancel</button>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-
+    <nav ng-controller="MyNavCtrl as MNC" class="navbar navbar-default">
       <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
@@ -125,6 +122,9 @@
   <script src="app.js"></script>
   <script src="views/profile/profile.js"></script>
   <script src="views/directory/directory.js"></script>
+  <script src="components/my-login-controller.js"></script>
+  <script src="components/st-api-cache.js"></script>
+  <script src="components/lds-io-api.js"></script>
   <script src="components/session/session.js"></script>
   <script src="components/version/version.js"></script>
   <script src="components/version/version-directive.js"></script>

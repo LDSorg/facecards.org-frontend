@@ -9,23 +9,29 @@ angular.module('myApp.profile', ['ngRoute'])
   });
 }])
 
-.controller('ProfileCtrl', [ 'MyAppSession', function (MyAppSession) {
-  var MP = this
-    ;
+.controller('ProfileCtrl', [
+  'MyAppSession'
+, 'LdsIoApi'
+, '$location'
+, function (MyAppSession, LdsIoApi, $location) {
+  var MP = this;
 
-  // sharing session data between the service
-  MP.session = MyAppSession.session;
-  MyAppSession.getProfile().then(function (profile) {
-    console.info('profile');
-    console.log(profile);
-    var photoUrl = 'https://lds.io/api/ldsio/'
-      + MP.session.id + '/photos/individual/'
-      + profile.individual_id + '/medium/'
-      + profile.name + '.jpg'
-      + '?access_token=' + MP.session.token
-      ;
+  MyAppSession.requireSession().then(function (session) {
+    LdsIoApi.profile(session).then(function (profile) {
+      console.info('profile');
+      console.log(profile);
 
-    MP.profile = profile;
-    MP.headshot = profile.photos[0] && photoUrl;
+      var photoUrl = 'https://lds.io/api/ldsio/'
+        + session.id + '/photos/individual/'
+        + profile.individual_id + '/medium/'
+        + profile.name + '.jpg'
+        + '?access_token=' + session.token
+        ;
+
+      MP.profile = profile;
+      MP.headshot = profile.photos[0] && photoUrl;
+    });
+  }, function () {
+    $location.url('#/');
   });
 }]);
