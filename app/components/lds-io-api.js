@@ -56,18 +56,77 @@ angular
       return promises[id];
     }
 
+    function promiseApiCall(session, id, url, opts) {
+      return StApiCache.read(id, url, function () {
+        return realGet(session, id, url);
+      }, opts).then(function (data) {
+        return data.value;
+      });
+    }
+
     return {
       profile: function (session, opts) {
         var id = session.id + '.me';
         var url = apiPrefix + '/' + session.id + '/me';
 
-        return StApiCache.read(id, url, function () {
-          return realGet(session, id, url);
-        }, opts).then(function (data) {
-          return data.value;
-        });
+        return promiseApiCall(
+          session
+        , id
+        , url
+        , opts
+        );
       }
-    , ward: function () {
+    , stake: function (session, stakeId, opts) {
+        var id = session.id + 'stake.' + stakeId;
+        var url = apiPrefix + '/' + session.id + '/stakes/' + stakeId;
+
+        return promiseApiCall(
+          session
+        , id
+        , url
+        , opts
+        );
+      }
+    , stakePhotos: function (session, stakeId, opts) {
+        var id = session.id + 'stake.' + stakeId;
+        var url = apiPrefix + '/' + session.id + '/stakes/' + stakeId + '/photos';
+
+        return promiseApiCall(
+          session
+        , id
+        , url
+        , opts
+        );
+      }
+    , ward: function (session, stakeId, wardId, opts) {
+        var id = session.id + 'stake.' + stakeId + '.ward.' + wardId;
+        var url = apiPrefix + '/' + session.id + '/stakes/' + stakeId + '/wards/' + wardId;
+
+        return promiseApiCall(
+          session
+        , id
+        , url
+        , opts
+        );
+      }
+    , wardPhotos: function (session, stakeId, wardId, opts) {
+        var id = session.id + 'stake.' + stakeId + '.ward.' + wardId;
+        var url = apiPrefix + '/' + session.id + '/stakes/' + stakeId + '/wards/' + wardId + '/photos';
+
+        return promiseApiCall(
+          session
+        , id
+        , url
+        , opts
+        );
+      }
+    , photoUrl: function (session, photo, type, size) {
+        // https://lds.io/api/ldsio/<accountId>/photos/individual/<individualId>/<date>/medium/<whatever>.jpg
+        return apiPrefix + '/' + session.id 
+          + '/photos/' + type
+          + '/' + photo.id + '/' + photo.updated_at 
+          + '/' + size + '/' + photo.id + '.jpg'
+          ;
       }
     };
   }])

@@ -1,1 +1,10 @@
 <p>This is the Directory View.</p>
+<div>
+  <p ng-if="!WDC.ward">Nothing to see here. Try logging in.</p>
+</div>
+<div ng-if="WDC.ward">
+  <pre><code>{{ WDC.ward | json }}</code></pre>
+</div>
+<div ng-if="WDC.wardPhotos">
+  <pre><code>{{ WDC.wardPhotos | json }}</code></pre>
+</div>

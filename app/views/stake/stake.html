@@ -1,0 +1,11 @@
+<p>This is the Stake Directory View.</p>
+<div>
+  <p ng-if="!SDC.stake">Nothing to see here. Try logging in.</p>
+  <p ng-if="SDC.loading">Loading...</p>
+</div>
+<div ng-if="SDC.stake">
+  <pre><code>{{ SDC.stake | json }}</code></pre>
+</div>
+<div ng-if="SDC.stakePhotos">
+  <pre><code>{{ SDC.stakePhotos | json }}</code></pre>
+</div>
