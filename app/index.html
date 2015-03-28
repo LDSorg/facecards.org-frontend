@@ -88,8 +88,119 @@
       </div>
     </div>
 
-    <div class="st-view-splash">
-      <p>Hello</p>
+    <div class="st-view-splash" ng-controller="SplashController as SC">
+      <div class="container"><span ng-if="!M.session.currentLoginId">
+          <div class="row">
+            <div class="col-sm-12">
+              <h3>Welcome to Facecards</h3>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <p>How well do you know your wardies? Login with your LDS.org account and find out!</p>
+              <p>
+                The idea here is quite straight-forward: We'll pull pictures from your ward directory
+                and let you guess each person's name.
+              </p>
+              <p>Guess correctly and you'll feel great.</p>
+              <p>
+                Guess wrong you'll realize that now is the time to repent and learn
+                the names of the people you see every Sunday!
+                
+              </p>
+            </div>
+          </div></span>
+        <div ng-if="!M.message &amp;&amp; !M.session.currentLoginId" class="row">
+          <div class="col-sm-12">
+            <p>
+              <center><img src="images/logo-256px.png"/></center>
+            </p>
+            <button type="button" ng-click="M.loginWithLds()" class="btn btn-block btn-social btn-ldsconnect"><i class="fa"><img src="images/moroni.png"/></i><span>Sign In with LDS.org</span></button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12"><span>&#32;</span></div>
+        </div><span ng-if="M.session.currentLoginId">
+          <div ng-if="M.alertMsg" class="row">
+            <div class="col-sm-12">
+              <div ng-if="M.alertMsg" class="alert alert-warning">{{ M.alertMsg }}</div>
+            </div>
+          </div>
+          <div ng-if="M.progress.message" class="row">
+            <div class="col-sm-12">
+              <div ng-if="M.progress.message" ng-class="{ 'progress-striped': M.progress.progress, 'active': M.progress.progress }" class="progress">
+                <div role="progressbar" aria-valuenow="{{ M.progress.progress }}" aria-valuemin="0" aria-valuemax="1000" style="width: {{ M.progress.progress }}%" class="progress-bar"><span class="sr-only">{{ M.progress.progress }}% Complete</span></div>
+              </div>
+              <div ng-if="M.progress.message">
+                <p> <span>{{ (M.progress.elapsed / 1000).toFixed(0) }}s&#32;</span><span>{{ M.progress.message }}</span></p>
+              </div>
+            </div>
+          </div><span ng-if="M.card">
+            <div class="row">
+              <div class="col-sm-12">
+                <div lds-group-selector="lds-group-selector" stakes="M.stakes" stake="M.stake" ward="M.ward" units="M.units" update="M.selectWard()" groups="M.groups"></div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-3"></div>
+              <div class="col-sm-6">
+                <center>
+                  <h4> <span>Who is this?</span></h4>
+                  <div class="media thumbnail">
+                    <div class="col-sm-6"><img ng-src="{{M.card.photo}}" style="height: 150px" class="media-object img-rounded"/>
+                      <button ng-click="M.skip()" class="form-control btn btn-link">Skip Missing Picture</button>
+                    </div>
+                    <div class="col-sm-6">
+                      <p><span>{{ M.hitCount + m.MissCount + 1 }}</span><span>&#32;of&#32;</span><span>{{ M.validCardCount }}</span><span>&#32;({{ M.allCards.length - M.validCardCount }} missing)</span><br/><span>{{ (((M.hitCount / (M.hitCount + M.missCount)) * 100)||0) | number:0 }}% Accuracy</span></p>
+                      <p ng-repeat="calling in M.card.callings">{{calling.name}}</p>
+                      <p ng-if="!M.card.callings">&nbsp;</p>
+                    </div>
+                  </div>
+                </center>
+              </div>
+              <div class="col-sm-3"></div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6">
+                <button ng-click="M.choose(0)" ng-bind="M.choices[0].name" ng-disabled="M.choices[0].disabled" ng-class="{ 'btn-danger': M.choices[0].disabled }" class="form-control btn btn-default">#1</button>
+              </div>
+              <div class="col-sm-6">
+                <button ng-click="M.choose(1)" ng-bind="M.choices[1].name" ng-disabled="M.choices[1].disabled" ng-class="{ 'btn-danger': M.choices[1].disabled }" class="form-control btn btn-default">#2</button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6">
+                <button ng-click="M.choose(2)" ng-bind="M.choices[2].name" ng-disabled="M.choices[2].disabled" ng-class="{ 'btn-danger': M.choices[2].disabled }" class="form-control btn btn-default">#3</button>
+              </div>
+              <div class="col-sm-6">
+                <button ng-click="M.choose(3)" ng-bind="M.choices[3].name" ng-disabled="M.choices[3].disabled" ng-class="{ 'btn-danger': M.choices[3].disabled }" class="form-control btn btn-default">#4</button>
+              </div>
+            </div></span>
+          <center ng-if="M.finished" class="row">
+            <div class="col-sm-12">
+              <h3>You Finished. Huzzah!</h3>
+              <div class="row">
+                <div class="col-sm-4"></div>
+                <div class="col-sm-4">
+                  <p>Congrats, you were {{ (((M.hitCount / (M.hitCount + M.missCount)) * 100)||0) | number:0 }}% accurate!</p>
+                  <p>
+                    <button ng-click="M.shareOnFacebook()" class="btn btn-info">Share on Facebook</button>
+                  </p>
+                </div>
+                <div class="col-sm-4"></div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-4"></div>
+              <div class="col-sm-4">
+                <p>
+                  <button type="button" ng-click="M.playAgain()" class="form-control btn btn-primary">Play Again?</button>
+                </p>
+              </div>
+              <div class="col-sm-4"></div>
+            </div>
+          </center></span>
+      </div>
     </div>
     <div ng-view></div>
 
