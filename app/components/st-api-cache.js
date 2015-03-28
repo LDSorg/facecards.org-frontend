@@ -41,7 +41,22 @@ angular
         if (!fresh) {
           fetch().then(fin);
         }
-        result = JSON.parse(localStorage.getItem('io.lds.' + id) || null);
+
+        result = localStorage.getItem('io.lds.' + id) || null;
+        if ('undefined' === result) {
+          console.warn("got undefined for " + 'io.lds.' + id);
+          result = null;
+        }
+
+        if (result) {
+          try {
+            result = JSON.parse(result);
+          } catch(e) {
+            result = null;
+            console.error("couldn't parse " + 'io.lds.' + id, localStorage.getItem('io.lds.' + id));
+            // ignore
+          }
+        }
       }
 
       if (result) {
