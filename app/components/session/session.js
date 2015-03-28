@@ -54,7 +54,7 @@ angular
         apiPrefix + '/accounts'
       , { headers: { 'Authorization': 'Bearer ' + session.token } }
       ).then(function (resp) {
-        var accounts = resp.data;
+        var accounts = resp.data && resp.data.accounts || resp.data;
         var id;
 
         // TODO accounts should be an object
@@ -77,6 +77,7 @@ angular
         }
 
         session.id = id;
+        session.ts = Date.now();
 
         return session;
       });
@@ -84,7 +85,12 @@ angular
 
     function logout() {
       // TODO also logout of lds.io
-      return destroy();
+      return $http.delete(
+        apiPrefix + '/session'
+      , { headers: { 'Authorization': 'Bearer ' + shared.session.token } }
+      ).then(function () {
+        return destroy();
+      });
     }
 
     function init() {
@@ -100,8 +106,6 @@ angular
 
     function parseLogin(name, url) {
       // TODO return granted_scope and expires_at
-      console.info('implicit grant url');
-      console.log(url);
 
       var match = url.match(/(^|\#|\?|\&)access_token=([^\&]+)(\&|$)/);
       var token;
@@ -124,8 +128,8 @@ angular
         parseLogin(name, url).then(function (token) {
           shared.session.token = token;
           // TODO rid token on reject
-          return testToken(shared.session).then(save).then(d.resolve, d.reject);
-        });
+          return testToken(shared.session).then(save);
+        }).then(d.resolve, d.reject);
       };
 
       var requestedScope = oauthscope || ['me'];
@@ -150,7 +154,7 @@ angular
 
       var d = $q.defer();
       var url = createLogin(d, oauthscope); // resolves in createLogin
-      var $iframe = $('<iframe src="' + url + '" width="800px" height="800px" border="0"></iframe>');
+      var $iframe = $('<iframe src="' + url + '" width="800px" height="800px" frameborder="0"></iframe>');
 
       function removeIframe(data) {
         silentLogin._inProgress = null;
@@ -187,12 +191,12 @@ angular
       }, function (/*err*/) {
         // TODO how to properly get callback from modal?
         $rootScope.rootShowLoginModal = true;
-        $rootScope.rootLoginPromise = $q.defer();
+        $rootScope.rootLoginDeferred = $q.defer();
         $timeout(function () {
           $rootScope.rootShowLoginModalFull = true;
-        }, 0);
+        }, 100);
 
-        return $rootScope.loginPromise;
+        return $rootScope.rootLoginDeferred.promise;
       });
     }
 
@@ -205,7 +209,7 @@ angular
       // because the watches will unwatch when the controller is destroyed
       _scope.__stsessionshared__ = shared;
       _scope.$watch('__stsessionshared__.session', function () {
-        if (shared.session.token) {
+        if (shared.session.id) {
           fn(shared.session);
         }
       }, true);
@@ -215,7 +219,7 @@ angular
       _scope.__stsessionshared__ = shared;
       _scope.$watch('__stsessionshared__.session', function () {
         if (!shared.session.token) {
-          fn(shared.session);
+          fn();
         }
       }, true);
     }

@@ -17,6 +17,7 @@ angular.module('myApp.profile', ['ngRoute'])
   var MP = this;
 
   MyAppSession.requireSession().then(function (session) {
+    console.error('profile the things');
     LdsIoApi.profile(session).then(function (profile) {
       console.info('profile');
       console.log(profile);
@@ -32,6 +33,6 @@ angular.module('myApp.profile', ['ngRoute'])
       MP.headshot = profile.photos[0] && photoUrl;
     });
   }, function () {
-    $location.url('#/');
+    $location.url('/');
   });
 }]);

@@ -28,6 +28,14 @@ angular.module('myApp').controller('MyNavCtrl', [
 
   var MNC = this;
 
+  MyAppSession.onLogin($scope, function (session) {
+    MNC.session = session;
+  });
+
+  MyAppSession.onLogout($scope, function () {
+    MNC.session = null;
+  });
+
   MyAppSession.restore().then(function (session) {
     MNC.session = session;
   });

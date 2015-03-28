@@ -35,6 +35,6 @@ angular.module('myApp.stake', ['ngRoute'])
     });
   }, function () {
     SDC.loading = false;
-    $location.url('#/');
+    $location.url('/');
   });
 }]);

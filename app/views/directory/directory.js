@@ -38,6 +38,6 @@ angular.module('myApp.directory', ['ngRoute'])
   }, function (err) {
     console.error(err);
     WDC.loading = false;
-    //$location.url('#/');
+    $location.url('/');
   });
 }]);

@@ -10,23 +10,23 @@ angular
     var MLC = this;
 
     function hide() {
-      $rootScope.showLoginModalFull = false;
+      $rootScope.rootShowLoginModalFull = false;
       // TODO use animate event?
       $timeout(function () {
-        $rootScope.showLoginModal = false;
+        $rootScope.rootShowLoginModal = false;
       }, 500);
     }
 
     MLC.login = function () {
       MyAppSession.login().then(function (session) {
-        $rootScope.rootLoginPromise.resolve(session);
+        $rootScope.rootLoginDeferred.resolve(session);
       }, function (err) {
-        $rootScope.rootLoginPromise.reject(err);
+        $rootScope.rootLoginDeferred.reject(err);
       }).then(hide);
     };
 
     MLC.cancel = function () {
-      $rootScope.rootLoginPromise.reject(new Error("login cancelled"));
+      $rootScope.rootLoginDeferred.reject(new Error("login cancelled"));
       hide();
     };
   }])
