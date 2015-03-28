@@ -113,8 +113,7 @@ angular.module('steve.progress', [])
     , "Accelerating to attack speed"
     ].sort(function () { return 0.5 - Math.random(); });
 
-    Progress.start = function (timeEstimate) {
-      console.log('starting progress');
+    Progress.start = function (timeEstimate, force) {
       var me = this;
       var total = 100;                          // 100%
       var updateRate = 250;                     // milliseconds
@@ -122,8 +121,7 @@ angular.module('steve.progress', [])
       var step = total / numSteps;              // each step would be 8.33% if there are 12 steps
       var msgUpdateRate = 2000;                 // milliseconds
 
-      if (me._started) {
-        console.log("already started");
+      if (!force && me._started) {
         return;
       }
       me._started = Date.now();
@@ -133,11 +131,9 @@ angular.module('steve.progress', [])
 
       function updateProgress() {
         // Goal get the counter to 75% by the estimated time
-
-        console.log(step);
         me.scope.progress += step;
         if (me.scope.progress >= 105) {
-          me.scope.progress = 70;
+          me.scope.progress = 100;
         }
         me.scope.elapsed = Date.now() - me._started;
         me.scope.remaining = timeEstimate - me.scope.elapsed;
@@ -151,7 +147,6 @@ angular.module('steve.progress', [])
 
       function update() {
         function innerUpdate() {
-          console.log('Hello!', me.scope.message);
           me.scope.message = Progress.messages[me._count % Progress.messages.length] + '...';
           me._count += 1;
           me._timer = $timeout(innerUpdate, msgUpdateRate);
@@ -160,16 +155,23 @@ angular.module('steve.progress', [])
       }
 
       me._count = me._count || 0;
-      update();
-      updateProgress();
+
+      me._timer3 = $timeout(function () {
+        update();
+        updateProgress();
+      }, 10);
     };
     Progress.stop = function (time) {
-      console.log('stopping progress');
       var me = this;
       var wait = time >= 100;
+      var progress = me.scope.progress;
       me.scope.progress = 100; // total %
       $timeout.cancel(me._timer);
       $timeout.cancel(me._timer2);
+      $timeout.cancel(me._timer3);
+      me._timer = null;
+      me._timer2 = null;
+      me._timer3 = null;
 
       function disappear() {
         me._started = 0;
@@ -177,7 +179,7 @@ angular.module('steve.progress', [])
         me.scope.message = '';
       }
 
-      if (wait) {
+      if (progress && wait) {
         return $timeout(disappear, (time || 0));
       } else {
         disappear();
@@ -188,9 +190,8 @@ angular.module('steve.progress', [])
       d.then(null, null, fn);
     };
     Progress.restart = function (time) {
-      Progress.stop(250).then(function () {
-        Progress.start(time);
-      });
+      Progress.stop(true);
+      Progress.start(time, true);
     };
 
     return Progress;
