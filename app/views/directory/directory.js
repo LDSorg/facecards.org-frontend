@@ -13,12 +13,14 @@ angular.module('myApp.directory', ['ngRoute'])
   'MyAppSession'
 , 'LdsIoApi'
 , '$location'
-, function (MyAppSession, LdsIoApi, $location) {
+, 'StProgress'
+, function (MyAppSession, LdsIoApi, $location, StProgress) {
   console.log("WDC HELLO");
   var WDC = this;
 
   WDC.loading = true;
   MyAppSession.requireSession().then(function (session) {
+    StProgress.start(10 * 1000);
     LdsIoApi.profile(session).then(function (profile) {
       LdsIoApi.ward(session, profile.home_stake_id, profile.home_ward_id).then(function (ward) {
         console.info('ward');
@@ -27,6 +29,7 @@ angular.module('myApp.directory', ['ngRoute'])
         WDC.ward = ward;
 
         LdsIoApi.wardPhotos(session, profile.home_stake_id, profile.home_ward_id).then(function (wardPhotos) {
+          StProgress.stop();
           WDC.loading = false;
           console.info('wardPhotos');
           console.log(wardPhotos);

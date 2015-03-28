@@ -13,11 +13,13 @@ angular.module('myApp.stake', ['ngRoute'])
   'MyAppSession'
 , 'LdsIoApi'
 , '$location'
-, function (MyAppSession, LdsIoApi, $location) {
+, 'StProgress'
+, function (MyAppSession, LdsIoApi, $location, StProgress) {
   var SDC = this;
 
   SDC.loading = true;
   MyAppSession.requireSession().then(function (session) {
+    StProgress.start(10 * 1000);
     LdsIoApi.profile(session).then(function (profile) {
       LdsIoApi.stake(session, profile.home_stake_id).then(function (stake) {
         console.info('stake');
@@ -26,6 +28,7 @@ angular.module('myApp.stake', ['ngRoute'])
         SDC.stake = stake;
       });
       LdsIoApi.stakePhotos(session, profile.home_stake_id).then(function (stakePhotos) {
+        StProgress.stop();
         SDC.loading = false;
         console.info('stakePhotos');
         console.log(stakePhotos);

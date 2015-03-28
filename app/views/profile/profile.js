@@ -13,12 +13,15 @@ angular.module('myApp.profile', ['ngRoute'])
   'MyAppSession'
 , 'LdsIoApi'
 , '$location'
-, function (MyAppSession, LdsIoApi, $location) {
+, 'StProgress'
+, function (MyAppSession, LdsIoApi, $location, StProgress) {
   var MP = this;
 
   MyAppSession.requireSession().then(function (session) {
     console.error('profile the things');
+    StProgress.start(10 * 1000);
     LdsIoApi.profile(session).then(function (profile) {
+      StProgress.stop();
       console.info('profile');
       console.log(profile);
 

@@ -43,6 +43,10 @@
               href=""
               class="btn btn-link"
               >Login <span class="sr-only"></span></a></li>
+            <li><a
+              href="#/progress"
+              class="btn btn-link"
+              >Waste Time <span class="sr-only"></span></a></li>
             <li ng-if="MNC.session.token"><a
               href="#/directory"
               class="btn btn-link"
@@ -69,6 +73,19 @@
         <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
+
+    <div ng-controller="ProgressController as PC">
+      <div ng-if="PC.progress.message" class="row">
+        <div class="col-sm-12">
+          <div ng-if="PC.progress.message" ng-class="{ 'progress-striped': PC.progress.progress, 'active': PC.progress.progress }" class="progress">
+            <div role="progressbar" aria-valuenow="{{ PC.progress.progress }}" aria-valuemin="0" aria-valuemax="1000" style="width: {{ PC.progress.progress }}%" class="progress-bar"><span class="sr-only">{{ PC.progress.progress }}% Complete</span><span ng-if="PC.progress.remainingMsg" class="pull-left">&nbsp;&nbsp;{{ PC.progress.remainingMsg }}&#32;</span></div>
+          </div>
+          <div ng-if="PC.progress.message">
+            <p> <span>{{ PC.progress.message }}</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div ng-view></div>
 
@@ -109,6 +126,8 @@
   <script src="views/profile/profile.js"></script>
   <script src="views/directory/directory.js"></script>
   <script src="views/stake/stake.js"></script>
+  <script src="views/progress/progress.js"></script>
+  <script src="components/st-progress.js"></script>
   <script src="components/my-login-controller.js"></script>
   <script src="components/st-api-cache.js"></script>
   <script src="components/lds-io-api.js"></script>

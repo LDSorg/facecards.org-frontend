@@ -10,7 +10,9 @@ angular.module('myApp', [
   'myApp.cache',
   'myApp.api',
   'myApp.login',
-  'myApp.session'
+  'myApp.session',
+  'myApp.progress',
+  'steve.progress'
 ]).
 config(['$routeProvider', function($routeProvider) {
   $routeProvider.otherwise({ redirectTo: '/' });
