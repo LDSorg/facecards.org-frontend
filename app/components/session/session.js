@@ -175,14 +175,26 @@ angular
       return silentLogin._inProgress;
     }
 
-    function login(oauthscope) {
-      var d = $q.defer();
-      var url = createLogin(d, oauthscope);
+    function login(oauthscope, opts) {
+      // TODO note that this must be called on a click event
+      // otherwise the browser will block the popup
+      function forceLogin() {
+        var d = $q.defer();
+        var url = createLogin(d, oauthscope);
 
-      // This is for client-side (implicit grant) oauth2
-      $window.open(url, 'ldsioLogin', 'height=720,width=620');
+        // This is for client-side (implicit grant) oauth2
+        $window.open(url, 'ldsioLogin', 'height=720,width=620');
 
-      return d.promise;
+        return d.promise;
+      }
+
+      return checkSession().then(function (session) {
+        if (!session.id || opts && opts.force) {
+          return forceLogin();
+        }
+
+        return session;
+      }, forceLogin);
     }
 
     function requireSession() {
