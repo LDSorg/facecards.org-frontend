@@ -41,8 +41,8 @@ angular.module('myApp').controller('MyNavCtrl', [
   });
 
   MNC.login = function (/*name*/) {
-    MyAppSession.login().then(function () {
-      return LdsIoApi.profile({ expire: true });
+    MyAppSession.login().then(function (session) {
+      return LdsIoApi.profile(session, { expire: true });
     });
   };
 
