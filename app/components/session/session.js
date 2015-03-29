@@ -18,10 +18,8 @@ angular
     var myAppDomain;
     var myAppId;
     
+    // note: host includes 'port' when port is non-80 / non-443
     myAppDomain = $window.location.protocol + '//' + $window.location.host;
-    if ($window.location.port) {
-      myAppDomain += ':' + $window.location.port;
-    }
     myAppDomain += $window.location.pathname;
 
     // TODO track granted scopes locally
