@@ -15,6 +15,7 @@ angular
     var apiPrefix = providerBase + '/api/ldsio';
     var myAppDomain = 'https://local.ldsconnect.org:8043';
     var myAppId = 'TEST_ID_9e78b54c44a8746a5727c972';
+    var logins = {};
     //var oauthPrefix = providerBase + '/api/oauth3';
 
     // TODO track granted scopes locally
@@ -112,38 +113,50 @@ angular
     function parseLogin(name, url) {
       // TODO return granted_scope and expires_at
 
-      var match = url.match(/(^|\#|\?|\&)access_token=([^\&]+)(\&|$)/);
+      var tokenMatch = url.match(/(^|\#|\?|\&)access_token=([^\&]+)(\&|$)/);
+      var idMatch = url.match(/(^|\#|\?|\&)id=([^\&]+)(\&|$)/);
       var token;
+      var id;
 
-      if (match) {
-        token = match[2];
+      if (tokenMatch) {
+        token = tokenMatch[2];
       }
-        
-      if (!token) {
+
+      if (idMatch) {
+        id = idMatch[2];
+      }
+
+      return { token: token, id: id };
+    }
+
+    $window.completeLogin = function (name, url) {
+      var params = parseLogin(name, url);
+      var d = logins[params.id];
+
+      if (!params.id) {
+        throw new Error("could not parse id from login");
+      }
+
+      if (!params.token) {
         return $q.reject(new Error("didn't get token")); // destroy();
       }
 
-      return $q.when(token);
-    }
+      shared.session.token = params.token;
+      // TODO rid token on reject
+      return testToken(shared.session).then(save).then(d.resolve, d.reject);
+    };
 
     function createLogin(d, oauthscope) {
-      $window.completeLogin = function (name, url) {
-        $window.completeLogin = null;
-
-        parseLogin(name, url).then(function (token) {
-          shared.session.token = token;
-          // TODO rid token on reject
-          return testToken(shared.session).then(save);
-        }).then(d.resolve, d.reject);
-      };
-
       var requestedScope = oauthscope || ['me'];
+      var id = Math.random().toString().replace(/0\./, '');
+      logins[id] = d;
 
       var url = 'https://lds.io/api/oauth3/authorization_dialog'
         + '?response_type=token'
         + '&client_id=' + myAppId
           // TODO use referrer?
-        + '&redirect_uri=' + myAppDomain + '/oauth-close.html?type=/providers/ldsio/callback/'
+        + '&redirect_uri='
+            + encodeURIComponent(myAppDomain + '/oauth-close.html?id=' + id + '&type=/providers/ldsio/callback/')
         + '&scope=' + encodeURIComponent(requestedScope.join(' '))
         + '&state=' + Math.random().toString().replace(/^0./, '')
         ;

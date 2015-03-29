@@ -5,10 +5,11 @@
   var name;
 
   if (!m) {
+    console.log(window.location.href);
     window.alert("callback URLs should be in the format /providers/{{strategy}}/callback");
+  } else {
+    name = m[1]
   }
-
-  name = m[1]
 
   setTimeout(function () {
     (window.opener||window.parent).completeLogin(name, window.location.href);
