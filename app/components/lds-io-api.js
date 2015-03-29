@@ -132,7 +132,7 @@ angular
         );
       }
     , wardPhotos: function (session, stakeId, wardId, opts) {
-        var id = session.id + 'stake.' + stakeId + '.ward.' + wardId;
+        var id = session.id + 'stake.' + stakeId + '.ward.' + wardId + '.photos';
         var url = apiPrefix + '/' + session.id + '/stakes/' + stakeId + '/wards/' + wardId + '/photos';
 
         return promiseApiCall(
@@ -142,12 +142,13 @@ angular
         , opts
         );
       }
-    , photoUrl: function (session, photo, type, size) {
+    , photoUrl: function (session, photo, size, type) {
         // https://lds.io/api/ldsio/<accountId>/photos/individual/<individualId>/<date>/medium/<whatever>.jpg
         return apiPrefix + '/' + session.id 
-          + '/photos/' + type
-          + '/' + photo.id + '/' + photo.updated_at 
-          + '/' + size + '/' + photo.id + '.jpg'
+          + '/photos/' + (type || photo.type)
+          + '/' + (photo.app_scoped_id || photo.id) + '/' + photo.updated_at 
+          + '/' + (size || 'medium') + '/' + (photo.app_scoped_id || photo.id) + '.jpg'
+          + '?access_token=' + session.token
           ;
       }
     };
