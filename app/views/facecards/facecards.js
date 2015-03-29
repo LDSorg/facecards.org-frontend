@@ -268,6 +268,11 @@ angular.module('facecards', ['ngRoute'])
     var card = cards.pop();
     var img;
 
+    if (!card) {
+      // done preloading
+      return;
+    }
+
     if (cardCache[card.id]) {
       return preload(cards);
     }
