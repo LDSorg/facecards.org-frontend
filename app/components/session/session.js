@@ -24,12 +24,17 @@ angular
     }
 
     function restore() {
+      // Being very careful not to trigger a false onLogin or onLogout via $watch
+      var storedSession;
+
       if (shared.session.token) {
         return $q.when(shared.session);
       }
 
-      shared.session = JSON.parse(localStorage.getItem('io.lds.session') || null) || {};
-      if (shared.session.token) {
+      storedSession = JSON.parse(localStorage.getItem('io.lds.session') || null) || {};
+
+      if (storedSession.token) {
+        shared.session = storedSession;
         return $q.when(shared.session);
       } else {
         return $q.reject(new Error("No Session"));
@@ -154,7 +159,7 @@ angular
 
       var d = $q.defer();
       var url = createLogin(d, oauthscope); // resolves in createLogin
-      var $iframe = $('<iframe src="' + url + '" width="800px" height="800px" frameborder="0"></iframe>');
+      var $iframe = $('<iframe src="' + url + '" width="1px" height="1px" style="opacity: 0.01;" frameborder="0"></iframe>');
 
       function removeIframe(data) {
         silentLogin._inProgress = null;
@@ -220,8 +225,8 @@ angular
       // This is better than using a promise.notify
       // because the watches will unwatch when the controller is destroyed
       _scope.__stsessionshared__ = shared;
-      _scope.$watch('__stsessionshared__.session', function () {
-        if (shared.session.id) {
+      _scope.$watch('__stsessionshared__.session', function (newValue, oldValue) {
+        if (!oldValue.token && newValue.id) {
           fn(shared.session);
         }
       }, true);
@@ -229,8 +234,8 @@ angular
 
     function onLogout(_scope, fn) {
       _scope.__stsessionshared__ = shared;
-      _scope.$watch('__stsessionshared__.session', function () {
-        if (!shared.session.token) {
+      _scope.$watch('__stsessionshared__.session', function (newValue, oldValue) {
+        if (oldValue.token && !newValue.token) {
           fn();
         }
       }, true);
@@ -239,7 +244,8 @@ angular
     init();
 
     return {
-      restore: restore
+      init: init
+    , restore: restore
     , destroy: destroy
     , login: login
     , logout: logout

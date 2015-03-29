@@ -113,7 +113,7 @@ angular.module('steve.progress', [])
     , "Accelerating to attack speed"
     ].sort(function () { return 0.5 - Math.random(); });
 
-    Progress.start = function (timeEstimate, force) {
+    Progress.start = function (timeEstimate, opts) {
       var me = this;
       var total = 100;                          // 100%
       var updateRate = 250;                     // milliseconds
@@ -121,13 +121,15 @@ angular.module('steve.progress', [])
       var step = total / numSteps;              // each step would be 8.33% if there are 12 steps
       var msgUpdateRate = 2000;                 // milliseconds
 
-      if (!force && me._started) {
+      if (!(opts && opts.force) && me._started) {
         return;
       }
+
       me._started = Date.now();
       me.scope.elapsed = 1000;
       me.scope.remaining = timeEstimate;
       me.scope.progress = 0;
+      me.scope.style = (opts && opts.style) || '';
 
       function updateProgress() {
         // Goal get the counter to 75% by the estimated time
@@ -163,8 +165,9 @@ angular.module('steve.progress', [])
     };
     Progress.stop = function (time) {
       var me = this;
-      var wait = time >= 100;
+      var wait = (time >= 100);
       var progress = me.scope.progress;
+
       me.scope.progress = 100; // total %
       $timeout.cancel(me._timer);
       $timeout.cancel(me._timer2);
@@ -189,9 +192,9 @@ angular.module('steve.progress', [])
     Progress.subscribe = function (fn) {
       d.then(null, null, fn);
     };
-    Progress.restart = function (time) {
-      Progress.stop(true);
-      Progress.start(time, true);
+    Progress.restart = function (time, opts) {
+      Progress.stop();
+      Progress.start(time, opts);
     };
 
     return Progress;

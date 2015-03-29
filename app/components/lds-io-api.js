@@ -4,10 +4,11 @@ angular
   .module('myApp.api', [])
   .service('LdsIoApi', [
     '$window'
+  , '$timeout'
   , '$q'
   , '$http'
   , 'StApiCache'
-  , function LdsIoApi($window, $q, $http, StApiCache) {
+  , function LdsIoApi($window, $timeout, $q, $http, StApiCache) {
     var providerBase = 'https://lds.io';
     var apiPrefix = providerBase + '/api/ldsio';
     var promises = {};
@@ -57,8 +58,29 @@ angular
     }
 
     function promiseApiCall(session, id, url, opts) {
+      opts = opts || {};
       return StApiCache.read(id, url, function () {
-        return realGet(session, id, url);
+        var d = $q.defer();
+
+        var token = $timeout(function () {
+          if (opts.tried) {
+            d.reject(new Error("timed out (twice) when attempting to get data"));
+            return;
+          }
+
+          opts.tried = true;
+          return promiseApiCall(session, id, url, opts).then(d.resolve, d.reject);
+        }, opts.tried && 16000 || 8000); 
+
+        realGet(session, id, url).then(function (data) {
+          $timeout.cancel(token);
+          return d.resolve(data);
+        }, function (err) {
+          $timeout.cancel(token);
+          return d.reject(err);
+        });
+
+        return d.promise;
       }, opts).then(function (data) {
         return data.value;
       });
