@@ -27,7 +27,6 @@ angular.module('facecards', ['ngRoute'])
   var cardCache = {};
 
   MyAppSession.onLogout($scope, function () {
-  console.log('logout');
     $location.url('/');
   });
 
@@ -70,7 +69,6 @@ angular.module('facecards', ['ngRoute'])
   //
   function startGame() {
     // TODO select stake and ward
-    console.info("Game Start");
     MyAppSession.requireSession().then(function (session) {
       return LdsIoApi.profile(session).then(function (profile) {
         return LdsIoApi.ward(session, profile.home_stake_id, profile.home_ward_id).then(function (ward) {
@@ -99,7 +97,6 @@ angular.module('facecards', ['ngRoute'])
               }
             });
 
-            console.log(ward.members[0]);
             return ward.members.filter(function (m) {
               return m.photoUrl;
             }).map(function (m) {
@@ -128,6 +125,7 @@ angular.module('facecards', ['ngRoute'])
     scope.goodCards.shift();
     nextCard();
   };
+
   scope.choose = function (i) {
     if (scope.card !== scope.choices[i]) {
       scope.misses[scope.card.id] = true;
@@ -150,30 +148,6 @@ angular.module('facecards', ['ngRoute'])
     scope.goodCards.shift();
     nextCard();
   };
-  /*
-  scope.makeGuess = function (item, model, str) {
-    if (str) {
-      scope.guess = str;
-    }
-
-    scope.guess = scope.guess || '';
-
-    console.log('guess', scope.guess);
-
-    if (scope.guess.toLowerCase() === scope.card.name.toLowerCase()) {
-      scope.goodCards.shift();
-      nextCard();
-    } else {
-      scope.hint = scope.card.name.substr(0, scope.hint.length + 1);
-      scope.guess = scope.hint;
-    }
-  };
-  */
-
-  scope.sortByName = function () {
-    // TODO sort by first name
-    return 0.5 - Math.random();
-  };
 
   function gameOver() {
     // do something
@@ -190,7 +164,6 @@ angular.module('facecards', ['ngRoute'])
   }
 
   function preloadImage(card) {
-    console.log('preload', card);
     var id = card.id;
     if (cardCache[id]) {
       return;
@@ -208,8 +181,6 @@ angular.module('facecards', ['ngRoute'])
   function nextCard() {
     var card = scope.goodCards[0];
     var id = scope.goodCards[0].id;
-
-    console.log('nextcard', card);
 
     // always be preloading the next 6 cards
     scope.goodCards.slice(0, 6).forEach(function (card) {
@@ -244,9 +215,6 @@ angular.module('facecards', ['ngRoute'])
     var i = 1;
 
     scope.card = card = scope.goodCards[0];
-    console.log('realNextCard', card);
-    //scope.hint = '';
-    //scope.guess = '';
     if (!scope.card) {
       gameOver();
       return;
@@ -278,7 +246,7 @@ angular.module('facecards', ['ngRoute'])
     scope.choices = choices;
 
     if (!scope.card.photo) {
-      console.log('[MISSING PERSON REPORT]', scope.card);
+      console.warn('[MISSING PERSON REPORT]', scope.card);
       scope.skip();
       return;
     }
@@ -307,40 +275,6 @@ angular.module('facecards', ['ngRoute'])
     );
   };
 
-  function loadsort(cards) {
-    var groups = [[], []];
-    cards.forEach(function (card, i) {
-      groups[i % groups.length].push(card);
-    });
-    groups.forEach(function (group) {
-      preload(group);
-    });
-  }
-
-  function preload(cards) {
-    var card = cards.pop();
-    var img;
-
-    if (!card) {
-      // done preloading
-      return;
-    }
-
-    if (cardCache[card.id]) {
-      return preload(cards);
-    }
-
-    img = new Image();
-    img.onload = function () {
-      cardCache[card.id] = true;
-      return preload(cards);
-    };
-    img.onerror = function () {
-      return preload(cards);
-    };
-    img.src = card.photo;
-  }
-
   scope.playAgain = function () {
     scope.hits = {};
     scope.hitCount = 0;
@@ -353,29 +287,5 @@ angular.module('facecards', ['ngRoute'])
     //loadsort(scope.allCards.slice(0));
     nextCard();
   };
-
-  function run() {
-    /*
-    var infog
-      , rosterg
-      ;
-    */
-
-    StProgress.start();
-    LdsConnect.init().then(function (_mine) {
-      console.log('mine');
-      console.log(mine);
-      mine = _mine;
-      //loadStakes(me.currentStakes, me.currentUnits.stakeUnitNo);
-      scope.stakes = mine.currentStakes;
-      scope.units = mine.currentUnits;
-      scope.groups = {
-        brethren: true
-      , sisters: true
-      , leadership: true
-      };
-      scope.selectWard();
-    });
-  }
 }])
 ;
