@@ -101,3 +101,8 @@ angular.module('myApp').controller('MyNavCtrl', [
     MyAppSession.logout();
   };
 }]);
+
+angular.module('myApp').run(['MyAppSession', function (MyAppSession) {
+  MyAppSession.init('TEST_ID_9e78b54c44a8746a5727c972');
+  MyAppSession.backgroundLogin();
+}]);

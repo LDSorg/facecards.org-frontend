@@ -13,10 +13,16 @@ angular
     var shared = { session: {} };
     var providerBase = 'https://lds.io';
     var apiPrefix = providerBase + '/api/ldsio';
-    var myAppDomain = 'https://local.ldsconnect.org:8043';
-    var myAppId = 'TEST_ID_9e78b54c44a8746a5727c972';
-    var logins = {};
     //var oauthPrefix = providerBase + '/api/oauth3';
+    var logins = {};
+    var myAppDomain;
+    var myAppId;
+    
+    myAppDomain = $window.location.protocol + '//' + $window.location.host;
+    if ($window.location.port) {
+      myAppDomain += ':' + $window.location.port;
+    }
+    myAppDomain += $window.location.pathname;
 
     // TODO track granted scopes locally
     function save(session) {
@@ -99,8 +105,12 @@ angular
       });
     }
 
-    function init() {
+    function init(appId) {
+      myAppId = appId;
       // TODO delete stale sessions (i.e. on public computers)
+    }
+
+    function backgroundLogin() {
       return restore().then(function (session) {
         // TODO check expirey
         return testToken(session);
@@ -254,8 +264,6 @@ angular
       }, true);
     }
 
-    init();
-
     return {
       init: init
     , restore: restore
@@ -266,6 +274,7 @@ angular
     , onLogout: onLogout
     , checkSession: checkSession
     , requireSession: requireSession
+    , backgroundLogin: backgroundLogin
     };
   }])
   ;
