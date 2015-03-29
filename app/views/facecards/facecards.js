@@ -95,7 +95,7 @@ angular.module('facecards', ['ngRoute'])
 
               // TODO check updated but deleted and flag in server api
               if (photo && photo.updated_at) {
-                m.photoUrl = LdsIoApi.photoUrl(session, photo, 'large', photo.type);
+                m.photoUrl = LdsIoApi.photoUrl(session, photo, 'medium', photo.type);
               }
             });
 
