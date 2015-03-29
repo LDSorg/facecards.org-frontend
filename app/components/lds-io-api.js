@@ -146,10 +146,26 @@ angular
         // https://lds.io/api/ldsio/<accountId>/photos/individual/<individualId>/<date>/medium/<whatever>.jpg
         return apiPrefix + '/' + session.id 
           + '/photos/' + (type || photo.type)
-          + '/' + (photo.app_scoped_id || photo.id) + '/' + photo.updated_at 
+          + '/' + (photo.app_scoped_id || photo.id) + '/' + (photo.updated_at || 'bad-updated-at')
           + '/' + (size || 'medium') + '/' + (photo.app_scoped_id || photo.id) + '.jpg'
           + '?access_token=' + session.token
           ;
+      }
+    , guessGender: function (m) {
+        var men = [ 'highPriest', 'high_priest', 'highpriest', 'elder', 'priest', 'teacher', 'deacon' ];
+        var women = [ 'reliefSociety', 'relief_society', 'reliefsociety', 'laurel', 'miamaid', 'beehive' ];
+
+        if (men.some(function (thing) {
+          return m[thing];
+        })) {
+          return 'male';
+        }
+
+        if (women.some(function (thing) {
+          return m[thing];
+        })) {
+          return 'female';
+        }
       }
     };
   }])
