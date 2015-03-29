@@ -175,27 +175,80 @@ angular.module('facecards', ['ngRoute'])
     return 0.5 - Math.random();
   };
 
-  function nextCard() {
-    // TODO skip cards without pics, but put those names in the deck
-    var choices = []
-      , card
-      , i = 1
+  function gameOver() {
+    // do something
+    scope.finished = true;
+    // https://www.facebook.com/sharer/sharer.php?s=100&p[url]=http://www.otlcampaign.org/blog/2013/02/04/inconvenient-truth-education-reform&p[images][0]=http://www.otlcampaign.org/sites/default/files/journey-for-justice-mlk-memorial.jpg&p[title]=The+Inconvenient+Truth+of+Education+%27Reform%27!&p[summary]=Recent+events+have+revealed+how+market-driven+education+policies,+deceivingly+labeled+as+%22reform,%22+are+revealing+their+truly+destructive+effects+on+the+streets+and+in+the+corridors+of+government:
+    scope.xfbShare = "https://www.facebook.com/sharer/sharer.php"
+      + '?s=100'
+      + '&p[title]=How+well+do+you+know+your+wardies?'
+      + '&p[url]=http://facecards.org'
+      + '&p[images][0]=http://facecards.org/images/logo-256px.png'
+      + '&p[summary]=Fight+the+awkward.+Learn+the+names+of+your+ward+members.'
       ;
+    return;
+  }
+
+  function preloadImage(card) {
+    console.log('preload', card);
+    var id = card.id;
+    if (cardCache[id]) {
+      return;
+    }
+    cardCache[id] = { img: new Image() };
+    cardCache[id].img.addEventListener('load', function () {
+      cardCache[id].loaded = true;
+    });
+    cardCache[id].img.addEventListener('error', function () {
+      cardCache[id].error = true;
+    });
+    cardCache[id].img.src = card.photo;
+  }
+
+  function nextCard() {
+    var card = scope.goodCards[0];
+    var id = scope.goodCards[0].id;
+
+    console.log('nextcard', card);
+
+    // always be preloading the next 6 cards
+    scope.goodCards.slice(0, 6).forEach(function (card) {
+      preloadImage(card);
+    });
+
+    if (cardCache[id].loaded) {
+      realNextCard();
+      return;
+    }
+    if (cardCache[id].error) {
+      scope.skip();
+      return;
+    }
+    
+    StProgress.start(2500);
+    cardCache[id].img.addEventListener('load', function () {
+      StProgress.stop(250);
+      realNextCard();
+      $scope.$apply();
+    });
+    cardCache[id].img.addEventListener('error', function () {
+      scope.skip();
+      $scope.$apply();
+    });
+  }
+
+  function realNextCard() {
+    // TODO skip cards without pics, but put those names in the deck
+    var choices = [];
+    var card;
+    var i = 1;
 
     scope.card = card = scope.goodCards[0];
+    console.log('realNextCard', card);
     //scope.hint = '';
     //scope.guess = '';
     if (!scope.card) {
-      // do something
-      scope.finished = true;
-      // https://www.facebook.com/sharer/sharer.php?s=100&p[url]=http://www.otlcampaign.org/blog/2013/02/04/inconvenient-truth-education-reform&p[images][0]=http://www.otlcampaign.org/sites/default/files/journey-for-justice-mlk-memorial.jpg&p[title]=The+Inconvenient+Truth+of+Education+%27Reform%27!&p[summary]=Recent+events+have+revealed+how+market-driven+education+policies,+deceivingly+labeled+as+%22reform,%22+are+revealing+their+truly+destructive+effects+on+the+streets+and+in+the+corridors+of+government:
-      scope.xfbShare = "https://www.facebook.com/sharer/sharer.php"
-        + '?s=100'
-        + '&p[title]=How+well+do+you+know+your+wardies?'
-        + '&p[url]=http://facecards.org'
-        + '&p[images][0]=http://facecards.org/images/logo-256px.png'
-        + '&p[summary]=Fight+the+awkward.+Learn+the+names+of+your+ward+members.'
-        ;
+      gameOver();
       return;
     }
 
@@ -207,6 +260,9 @@ angular.module('facecards', ['ngRoute'])
       i += 1;
     }
 
+    // TODO why isn't this one 1 also?
+    // BUG XXX when hanna was playing she had the same dude's name
+    // appear as 2 (not just 1) of the 4 options.
     i = 0;
     while (i < scope.allCards.length && choices.length < 12) {
       if (card.gender === scope.allCards[i].gender) {
@@ -220,9 +276,6 @@ angular.module('facecards', ['ngRoute'])
     shuffle(choices);
 
     scope.choices = choices;
-
-    console.log('scope.card -- CHEATER NO CHEATING!!!');
-    console.log(scope.card);
 
     if (!scope.card.photo) {
       console.log('[MISSING PERSON REPORT]', scope.card);
@@ -297,9 +350,7 @@ angular.module('facecards', ['ngRoute'])
     scope.finished = false;
     shuffle(scope.allCards);
     scope.goodCards = scope.allCards.slice(0);
-    console.log('scope.goodCards');
-    console.log(scope.goodCards);
-    loadsort(scope.allCards.slice(0));
+    //loadsort(scope.allCards.slice(0));
     nextCard();
   };
 
