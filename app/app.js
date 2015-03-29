@@ -8,18 +8,63 @@ angular.module('myApp', [
   'myApp.login',
   'myApp.session',
   'myApp.progress',
+  'myApp.splash',
+  'facecards',
   'steve.progress'
 ])
 .config(['$routeProvider', function($routeProvider) {
   $routeProvider.otherwise({ redirectTo: '/' });
   //$routeProvider.otherwise({ redirectTo: '/profile' });
 }])
+;
+
+angular.module('myApp.splash', ['ngRoute'])
 .config(['$routeProvider', function($routeProvider) {
-  var tpl = $('st-view-splash').html();
-  $('st-view-splash').html('');
   $routeProvider.when('/', {
-    template: tpl
+    template: '<p>Error: Should have redirected to either /login or /play</p>'
+  , controller: 'RootController as RC'
   });
+}])
+.controller('RootController', [ 
+    'MyAppSession'
+  , 'LdsIoApi'
+  , '$location'
+  , function (MyAppSession, LdsIoApi, $location) {
+  //var RC = this;
+
+  console.info('root controller');
+  MyAppSession.checkSession().then(function (session) {
+    console.info('root controller checked');
+    if (session.token) {
+      $location.url('/play');
+    } else {
+      $location.url('/login');
+    }
+  }, function () {
+    $location.url('/login');
+  });
+}])
+.config(['$routeProvider', function($routeProvider) {
+  var tpl = window.jQuery('.st-view-splash').html();
+  window.jQuery('.st-view-splash').html(' ');
+  $routeProvider.when('/login', {
+    template: tpl
+  , controller: 'SplashController as SC'
+  });
+}])
+.controller('SplashController', [ 
+    'MyAppSession'
+  , 'LdsIoApi'
+  , '$location'
+  , function (MyAppSession, LdsIoApi, $location) {
+  var SC = this;
+
+  SC.login = function (/*name*/) {
+    MyAppSession.login().then(function (session) {
+      $location.url('/play');
+      return LdsIoApi.profile(session);
+    });
+  };
 }])
 ;
 

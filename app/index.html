@@ -33,33 +33,18 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/">Home</a>
+          <div style="width:48px;" class="pull-left"><img src="images/logo-256px.png" style="height: 44px; position: relative; top: 4px;"/></div>
+          <a class="navbar-brand" href="/">Facecards</a><!--small>Get Face-to-Face with your Wardies</small-->
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" ng-class="!MNC.navCollapsed && 'in'">
           <ul class="nav navbar-nav navbar-right">
-            <li ng-if="!MNC.session.id"><a
+            <li ng-if="!MNC.session.token"><a
               ng-click="MNC.login()"
               href=""
               class="btn btn-link"
               >Login <span class="sr-only"></span></a></li>
-            <li><a
-              href="#/progress"
-              class="btn btn-link"
-              >Waste Time <span class="sr-only"></span></a></li>
-            <li ng-if="MNC.session.token"><a
-              href="#/directory"
-              class="btn btn-link"
-              >Ward Directory <span class="sr-only"></span></a></li>
-            <li ng-if="MNC.session.token"><a
-              href="#/stake"
-              class="btn btn-link"
-              >Stake Directory <span class="sr-only"></span></a></li>
-            <li ng-if="MNC.session.token"><a
-              href="#/profile"
-              class="btn btn-link"
-              >Profile <span class="sr-only"></span></a></li>
             <li ng-if="MNC.session.token"><a
               ng-click="MNC.logout()"
               href="#/"
@@ -79,66 +64,42 @@
       <div ng-if="PC.progress.message" class="row">
         <div class="col-sm-12">
           <div ng-if="PC.progress.message" ng-class="{ 'progress-striped': PC.progress.progress, 'active': PC.progress.progress }" class="progress">
-            <div role="progressbar" aria-valuenow="{{ PC.progress.progress }}" aria-valuemin="0" aria-valuemax="1000" style="width: {{ PC.progress.progress }}%" class="progress-bar"><span class="sr-only">{{ PC.progress.progress }}% Complete</span><span ng-if="PC.progress.remainingMsg" class="pull-left">&nbsp;&nbsp;{{ PC.progress.remainingMsg }}&#32;</span></div>
+            <div
+              role="progressbar"
+              aria-valuenow="{{ PC.progress.progress }}"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              style="width: {{ PC.progress.progress }}%"
+              class="progress-bar"
+              ng-class="{ 'progress-bar-success': 'success' == PC.progress.style, 'progress-bar-info': 'info' == PC.progress.style, 'progress-bar-warning': 'warning' == PC.progress.style, 'progress-bar-danger': 'danger' == PC.progress.style }"
+            ><span class="sr-only">{{ PC.progress.progress }}% Complete</span><span ng-if="PC.progress.remainingMsg" class="pull-left">&nbsp;&nbsp;{{ PC.progress.remainingMsg }}&#32;</span></div>
           </div>
           <div ng-if="PC.progress.message">
-            <p> <span>{{ PC.progress.message }}</span></p>
+            <p><center>{{ PC.progress.message }}</center></p>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="st-view-splash" ng-controller="SplashController as SC">
-      <div class="container"><span ng-if="!M.session.currentLoginId">
-          <div class="row">
-            <div class="col-sm-12">
-              <h3>Welcome to Facecards</h3>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-sm-12">
-              <p>How well do you know your wardies? Login with your LDS.org account and find out!</p>
-              <p>
-                The idea here is quite straight-forward: We'll pull pictures from your ward directory
-                and let you guess each person's name.
-              </p>
-              <p>Guess correctly and you'll feel great.</p>
-              <p>
-                Guess wrong you'll realize that now is the time to repent and learn
-                the names of the people you see every Sunday!
-                
-              </p>
-            </div>
-          </div></span>
-        <div ng-if="!M.message &amp;&amp; !M.session.currentLoginId" class="row">
-          <div class="col-sm-12">
-            <p>
-              <center><img src="images/logo-256px.png"/></center>
-            </p>
-            <button type="button" ng-click="M.loginWithLds()" class="btn btn-block btn-social btn-ldsconnect"><i class="fa"><img src="images/moroni.png"/></i><span>Sign In with LDS.org</span></button>
-          </div>
-        </div>
+    <div class="st-view-facecards">
+      <div class="container">
+        <div ng-if="FC.flashMessage" class="alert alert-info">{{ FC.flashMessage }}</div>
+
         <div class="row">
           <div class="col-sm-12"><span>&#32;</span></div>
-        </div><span ng-if="M.session.currentLoginId">
-          <div ng-if="M.alertMsg" class="row">
+        </div>
+
+        <span>
+          <div ng-if="FC.alertMsg" class="row">
             <div class="col-sm-12">
-              <div ng-if="M.alertMsg" class="alert alert-warning">{{ M.alertMsg }}</div>
+              <div ng-if="FC.alertMsg" class="alert alert-warning">{{ FC.alertMsg }}</div>
             </div>
           </div>
-          <div ng-if="M.progress.message" class="row">
-            <div class="col-sm-12">
-              <div ng-if="M.progress.message" ng-class="{ 'progress-striped': M.progress.progress, 'active': M.progress.progress }" class="progress">
-                <div role="progressbar" aria-valuenow="{{ M.progress.progress }}" aria-valuemin="0" aria-valuemax="1000" style="width: {{ M.progress.progress }}%" class="progress-bar"><span class="sr-only">{{ M.progress.progress }}% Complete</span></div>
-              </div>
-              <div ng-if="M.progress.message">
-                <p> <span>{{ (M.progress.elapsed / 1000).toFixed(0) }}s&#32;</span><span>{{ M.progress.message }}</span></p>
-              </div>
-            </div>
-          </div><span ng-if="M.card">
+
+          <span ng-if="FC.card">
             <div class="row">
               <div class="col-sm-12">
-                <div lds-group-selector="lds-group-selector" stakes="M.stakes" stake="M.stake" ward="M.ward" units="M.units" update="M.selectWard()" groups="M.groups"></div>
+                <div lds-group-selector="lds-group-selector" stakes="FC.stakes" stake="FC.stake" ward="FC.ward" units="FC.units" update="FC.selectWard()" groups="FC.groups"></div>
               </div>
             </div>
             <div class="row">
@@ -147,13 +108,13 @@
                 <center>
                   <h4> <span>Who is this?</span></h4>
                   <div class="media thumbnail">
-                    <div class="col-sm-6"><img ng-src="{{M.card.photo}}" style="height: 150px" class="media-object img-rounded"/>
-                      <button ng-click="M.skip()" class="form-control btn btn-link">Skip Missing Picture</button>
+                    <div class="col-sm-6"><img ng-src="{{FC.card.photo}}" style="height: 150px" class="media-object img-rounded"/>
+                      <button ng-click="FC.skip()" class="form-control btn btn-link">Skip Missing Picture</button>
                     </div>
                     <div class="col-sm-6">
-                      <p><span>{{ M.hitCount + m.MissCount + 1 }}</span><span>&#32;of&#32;</span><span>{{ M.validCardCount }}</span><span>&#32;({{ M.allCards.length - M.validCardCount }} missing)</span><br/><span>{{ (((M.hitCount / (M.hitCount + M.missCount)) * 100)||0) | number:0 }}% Accuracy</span></p>
-                      <p ng-repeat="calling in M.card.callings">{{calling.name}}</p>
-                      <p ng-if="!M.card.callings">&nbsp;</p>
+                      <p><span>{{ FC.hitCount + m.MissCount + 1 }}</span><span>&#32;of&#32;</span><span>{{ FC.validCardCount }}</span><span>&#32;({{ FC.allCards.length - FC.validCardCount }} missing)</span><br/><span>{{ (((FC.hitCount / (FC.hitCount + FC.missCount)) * 100)||0) | number:0 }}% Accuracy</span></p>
+                      <p ng-repeat="calling in FC.card.callings">{{calling.name}}</p>
+                      <p ng-if="!FC.card.callings">&nbsp;</p>
                     </div>
                   </div>
                 </center>
@@ -162,29 +123,29 @@
             </div>
             <div class="row">
               <div class="col-sm-6">
-                <button ng-click="M.choose(0)" ng-bind="M.choices[0].name" ng-disabled="M.choices[0].disabled" ng-class="{ 'btn-danger': M.choices[0].disabled }" class="form-control btn btn-default">#1</button>
+                <button ng-click="FC.choose(0)" ng-bind="FC.choices[0].name" ng-disabled="FC.choices[0].disabled" ng-class="{ 'btn-danger': FC.choices[0].disabled }" class="form-control btn btn-default">#1</button>
               </div>
               <div class="col-sm-6">
-                <button ng-click="M.choose(1)" ng-bind="M.choices[1].name" ng-disabled="M.choices[1].disabled" ng-class="{ 'btn-danger': M.choices[1].disabled }" class="form-control btn btn-default">#2</button>
+                <button ng-click="FC.choose(1)" ng-bind="FC.choices[1].name" ng-disabled="FC.choices[1].disabled" ng-class="{ 'btn-danger': FC.choices[1].disabled }" class="form-control btn btn-default">#2</button>
               </div>
             </div>
             <div class="row">
               <div class="col-sm-6">
-                <button ng-click="M.choose(2)" ng-bind="M.choices[2].name" ng-disabled="M.choices[2].disabled" ng-class="{ 'btn-danger': M.choices[2].disabled }" class="form-control btn btn-default">#3</button>
+                <button ng-click="FC.choose(2)" ng-bind="FC.choices[2].name" ng-disabled="FC.choices[2].disabled" ng-class="{ 'btn-danger': FC.choices[2].disabled }" class="form-control btn btn-default">#3</button>
               </div>
               <div class="col-sm-6">
-                <button ng-click="M.choose(3)" ng-bind="M.choices[3].name" ng-disabled="M.choices[3].disabled" ng-class="{ 'btn-danger': M.choices[3].disabled }" class="form-control btn btn-default">#4</button>
+                <button ng-click="FC.choose(3)" ng-bind="FC.choices[3].name" ng-disabled="FC.choices[3].disabled" ng-class="{ 'btn-danger': FC.choices[3].disabled }" class="form-control btn btn-default">#4</button>
               </div>
             </div></span>
-          <center ng-if="M.finished" class="row">
+          <center ng-if="FC.finished" class="row">
             <div class="col-sm-12">
               <h3>You Finished. Huzzah!</h3>
               <div class="row">
                 <div class="col-sm-4"></div>
                 <div class="col-sm-4">
-                  <p>Congrats, you were {{ (((M.hitCount / (M.hitCount + M.missCount)) * 100)||0) | number:0 }}% accurate!</p>
+                  <p>Congrats, you were {{ (((FC.hitCount / (FC.hitCount + FC.missCount)) * 100)||0) | number:0 }}% accurate!</p>
                   <p>
-                    <button ng-click="M.shareOnFacebook()" class="btn btn-info">Share on Facebook</button>
+                    <button ng-click="FC.shareOnFacebook()" class="btn btn-info">Share on Facebook</button>
                   </p>
                 </div>
                 <div class="col-sm-4"></div>
@@ -194,16 +155,63 @@
               <div class="col-sm-4"></div>
               <div class="col-sm-4">
                 <p>
-                  <button type="button" ng-click="M.playAgain()" class="form-control btn btn-primary">Play Again?</button>
+                  <button type="button" ng-click="FC.playAgain()" class="form-control btn btn-primary">Play Again?</button>
                 </p>
               </div>
               <div class="col-sm-4"></div>
             </div>
           </center></span>
+
       </div>
     </div>
+
+
+    <div class="st-view-splash">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <h3>Welcome to Facecards</h3>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <p>How well do you know your wardies? Login with your LDS.org account and find out!</p>
+            <p>
+              The idea here is quite straight-forward: We'll pull pictures from your ward directory
+              and let you guess each person's name.
+            </p>
+            <p>Guess correctly and you'll feel great.</p>
+            <p>
+              Guess wrong you'll realize that now is the time to repent and learn
+              the names of the people you see every Sunday!
+              
+            </p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <p>
+              <center><img src="images/logo-256px.png"/></center>
+            </p>
+            <button type="button" ng-click="SC.login()" class="btn btn-block btn-social btn-ldsconnect"><i class="fa"><img src="images/moroni-32px.png"/></i><span>Sign In with LDS.org</span></button>
+          </div>
+        </div>        
+      </div>
+    </div>
+
+
+
     <div ng-view></div>
 
+    <div class="footer non-print">
+      <div class="row">
+        <div class="col-sm-12">
+          <center><span>Built with  </span>
+            <!--a(target="_blank", href="https://youtu.be/N-soFXDN6Ss#t=58", style="text-decoration: none;")  &#x2665;--><a target="_blank" href="https://ldsconnect.org/vids/built-with-love" style="text-decoration: none; color: #F778A1; font-size: 1.3em;"> &#x2665;</a><span>  by  </span><a target="_blank" href="https://coolaj86.com">AJ</a><span>&nbsp;(</span><a target="_blank" href="https://AJ.the.DJ">the DJ</a><span>)</span>
+          </center>
+        </div>
+      </div>
+    </div>
   </div> <!-- /.container -->
 
   <!-- root login modal -->
@@ -236,8 +244,11 @@
   <script src="jquery-2.1.3.min.js"></script>
   <script src="bower_components/angular/angular.js"></script>
   <script src="bower_components/angular-route/angular-route.js"></script>
+  <script src="bower_components/knuth-shuffle/index.js"></script>
+
   <script src="app.js"></script>
   <script src="views/progress/progress.js"></script>
+  <script src="views/facecards/facecards.js"></script>
   <script src="components/st-progress.js"></script>
   <script src="components/my-login-controller.js"></script>
   <script src="components/st-api-cache.js"></script>
