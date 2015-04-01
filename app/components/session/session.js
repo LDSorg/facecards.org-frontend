@@ -95,11 +95,23 @@ angular
 
     function logout() {
       // TODO also logout of lds.io
+      /*
       return $http.delete(
         apiPrefix + '/session'
       , { headers: { 'Authorization': 'Bearer ' + shared.session.token } }
       ).then(function () {
         return destroy();
+      });
+      */
+
+      var url = 'https://lds.io/logout.html'
+      var $iframe = $('<iframe src="' + url + '" width="1px" height="1px" style="opacity: 0.01;" frameborder="0"></iframe>');
+      $('body').append($iframe);
+      
+      return $timeout(function () {
+        $iframe.remove();
+      }, 500).then(function () {
+        destroy();
       });
     }
 
@@ -247,7 +259,7 @@ angular
       // because the watches will unwatch when the controller is destroyed
       _scope.__stsessionshared__ = shared;
       _scope.$watch('__stsessionshared__.session', function (newValue, oldValue) {
-        if (!oldValue.token && newValue.id) {
+        if (!oldValue.id && newValue.id) {
           fn(shared.session);
         }
       }, true);
@@ -257,7 +269,7 @@ angular
       _scope.__stsessionshared__ = shared;
       _scope.$watch('__stsessionshared__.session', function (newValue, oldValue) {
         if (oldValue.token && !newValue.token) {
-          fn();
+          fn(null);
         }
       }, true);
     }

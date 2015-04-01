@@ -27,6 +27,7 @@ angular.module('facecards', ['ngRoute'])
   var cardCache = {};
 
   MyAppSession.onLogout($scope, function () {
+    StProgress.stop(0);
     $location.url('/');
   });
 
@@ -200,6 +201,7 @@ angular.module('facecards', ['ngRoute'])
       $scope.$apply();
     });
     cardCache[id].img.addEventListener('error', function () {
+      StProgress.stop(250);
       scope.skip();
       $scope.$apply();
     });

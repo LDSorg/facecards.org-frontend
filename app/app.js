@@ -56,13 +56,22 @@ angular.module('myApp.splash', ['ngRoute'])
     'MyAppSession'
   , 'LdsIoApi'
   , '$location'
-  , function (MyAppSession, LdsIoApi, $location) {
+  , '$scope'
+  , function (MyAppSession, LdsIoApi, $location, $scope) {
   var SC = this;
+
+  MyAppSession.onLogin($scope, function () {
+    $location.url('/');
+  });
 
   SC.login = function (/*name*/) {
     MyAppSession.login().then(function (session) {
-      $location.url('/play');
+      $location.url('/');
       return LdsIoApi.profile(session);
+    }, function (err) {
+      // just in case the session is bad
+      MyAppSession.logout();
+      window.alert("Login failed: " + err.message);
     });
   };
 }])
@@ -72,10 +81,11 @@ angular.module('myApp').controller('MyNavCtrl', [
     '$scope'
   , '$timeout'
   , '$window'
+  , '$location'
   , '$http'
   , 'MyAppSession'
   , 'LdsIoApi'
-  , function ($scope, $timeout, $window, $http, MyAppSession, LdsIoApi) {
+  , function ($scope, $timeout, $window, $location, $http, MyAppSession, LdsIoApi) {
 
   var MNC = this;
 
@@ -93,7 +103,12 @@ angular.module('myApp').controller('MyNavCtrl', [
 
   MNC.login = function (/*name*/) {
     MyAppSession.login().then(function (session) {
-      return LdsIoApi.profile(session, { expire: true });
+      return LdsIoApi.profile(session, { expire: true }).then(function () {
+        MNC.session = MNC.session;
+      });
+    }, function (err) {
+      MyAppSession.logout();
+      window.alert("Login failed: " + err.message);
     });
   };
 

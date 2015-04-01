@@ -168,7 +168,10 @@ angular.module('steve.progress', [])
       var wait = (time >= 100);
       var progress = me.scope.progress;
 
-      me.scope.progress = 100; // total %
+      if (me._timer || me._timer2 || me._timer3) {
+        me.scope.progress = 100; // total %
+      }
+
       $timeout.cancel(me._timer);
       $timeout.cancel(me._timer2);
       $timeout.cancel(me._timer3);
