@@ -53,10 +53,10 @@ echo "    node ./serve.js"
 echo ""
 echo ""
 
-echo "2. Open up a new tab and run the server like so:"
+echo "2. Open up yet another new tab and take a look at the frontend:"
 echo ""
 echo "    pushd" "$FC_FRONTEND_DIR"
-echo "    ls
+echo "    ls ./app"
 echo ""
 echo "  This is where you can edit files to your heart's content"
 echo ""

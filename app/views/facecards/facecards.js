@@ -31,8 +31,6 @@ angular.module('facecards', ['ngRoute'])
   });
 
   MyAppSession.requireSession().then(function (session) {
-    // TODO this should be a directive and I realize that.
-    // I'm just to lazy to do it right, right now
     $location.url('/play');
 
     FC.flashMessage = "Downloading Ward / Stake info...";
@@ -47,7 +45,6 @@ angular.module('facecards', ['ngRoute'])
           FC.flashMessage = "";
           StProgress.stop(350);
           startGame();
-          // update roster with photourls
         });
       });
     }, function (err) {
