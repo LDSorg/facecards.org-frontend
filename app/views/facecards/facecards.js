@@ -43,7 +43,7 @@ angular.module('facecards', ['ngRoute'])
       return LdsIoApi.ward(session, profile.home_stake_id, profile.home_ward_id).then(function (/*ward*/) {
         FC.flashMessage = "Downloading Photo directory...";
         StProgress.restart(10 * 1000, { style: "warning" });
-        return LdsIoApi.wardPhotos(session, session.home_stake_id, profile.home_ward_id).then(function (/*photos*/) {
+        return LdsIoApi.wardPhotos(session, profile.home_stake_id, profile.home_ward_id).then(function (/*photos*/) {
           FC.flashMessage = "";
           StProgress.stop(350);
           startGame();
