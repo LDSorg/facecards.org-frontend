@@ -9,9 +9,12 @@ angular
   , '$http'
   , 'StApiCache'
   , function LdsIoApi($window, $timeout, $q, $http, StApiCache) {
-    var providerBase = 'https://lds.io';
+    var providerBase = localStorage.getItem('providerUri') || 'https://lds.io';
     var apiPrefix = providerBase + '/api/ldsio';
     var promises = {};
+    console.info("API set to " + providerBase);
+    console.log("set to custom provider with `localStorage.setItem('providerUri', 'https://example.com')`");
+    console.log("or set to default with `localStorage.removeItem('providerUri')`");
 
     /*
     function batchApiCall(ids, url, handler) {

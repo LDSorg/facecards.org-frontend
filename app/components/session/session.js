@@ -11,7 +11,8 @@ angular
   , 'StApiCache'
   , function StSession($window, $rootScope, $timeout, $q, $http, StApiCache) {
     var shared = { session: {} };
-    var providerBase = 'https://lds.io';
+    var providerBase = localStorage.getItem('providerUri') || 'https://lds.io';
+    console.warn("TODO set UI flag with notice when in developer mode");
     var apiPrefix = providerBase + '/api/ldsio';
     //var oauthPrefix = providerBase + '/api/oauth3';
     var logins = {};
@@ -104,7 +105,7 @@ angular
       });
       */
 
-      var url = 'https://lds.io/logout.html'
+      var url = providerBase + '/logout.html'
       var $iframe = $('<iframe src="' + url + '" width="1px" height="1px" style="opacity: 0.01;" frameborder="0"></iframe>');
       $('body').append($iframe);
       
@@ -171,7 +172,7 @@ angular
       var id = Math.random().toString().replace(/0\./, '');
       logins[id] = d;
 
-      var url = 'https://lds.io/api/oauth3/authorization_dialog'
+      var url = providerBase + '/api/oauth3/authorization_dialog'
         + '?response_type=token'
         + '&client_id=' + myAppId
           // TODO use referrer?
