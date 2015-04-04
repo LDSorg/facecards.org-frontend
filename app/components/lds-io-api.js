@@ -146,7 +146,7 @@ angular
         );
       }
     , photoUrl: function (session, photo, size, type) {
-        // https://lds.io/api/ldsio/<accountId>/photos/individual/<individualId>/<date>/medium/<whatever>.jpg
+        // https://lds.io/api/ldsio/<accountId>/photos/individual/<appScopedId>/<date>/medium/<whatever>.jpg
         return apiPrefix + '/' + session.id 
           + '/photos/' + (type || photo.type)
           + '/' + (photo.app_scoped_id || photo.id) + '/' + (photo.updated_at || 'bad-updated-at')

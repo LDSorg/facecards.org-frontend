@@ -39,10 +39,18 @@ angular.module('facecards', ['ngRoute'])
     return LdsIoApi.profile(session).then(function (profile) {
       FC.flashMessage = "Downloading Ward directory...";
       StProgress.restart(6 * 1000, { style: "success" });
-      return LdsIoApi.ward(session, profile.home_stake_id, profile.home_ward_id).then(function (/*ward*/) {
+      return LdsIoApi.ward(
+        session
+      , profile.home_stake_app_scoped_id || profile.home_stake_id
+      , profile.home_ward_app_scoped_id || profile.home_ward_id 
+      ).then(function (/*ward*/) {
         FC.flashMessage = "Downloading Photo directory...";
         StProgress.restart(10 * 1000, { style: "warning" });
-        return LdsIoApi.wardPhotos(session, profile.home_stake_id, profile.home_ward_id).then(function (/*photos*/) {
+        return LdsIoApi.wardPhotos(
+          session
+        , profile.home_stake_app_scoped_id || profile.home_stake_id
+        , profile.home_ward_app_scoped_id || profile.home_ward_id 
+        ).then(function (/*photos*/) {
           FC.flashMessage = "";
           StProgress.stop(350);
           startGame();
@@ -69,8 +77,16 @@ angular.module('facecards', ['ngRoute'])
     // TODO select stake and ward
     MyAppSession.requireSession().then(function (session) {
       return LdsIoApi.profile(session).then(function (profile) {
-        return LdsIoApi.ward(session, profile.home_stake_id, profile.home_ward_id).then(function (ward) {
-          return LdsIoApi.wardPhotos(session, profile.home_stake_id, profile.home_ward_id).then(function (photos) {
+        return LdsIoApi.ward(
+          session
+        , profile.home_stake_app_scoped_id || profile.home_stake_id
+        , profile.home_ward_app_scoped_id || profile.home_ward_id 
+        ).then(function (ward) {
+          return LdsIoApi.wardPhotos(
+            session
+          , profile.home_stake_app_scoped_id || profile.home_stake_id
+          , profile.home_ward_app_scoped_id || profile.home_ward_id 
+          ).then(function (photos) {
             var memberMap = {};
             var photoMemberMap = {};
             var photoHomeMap = {};
