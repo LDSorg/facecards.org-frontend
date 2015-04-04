@@ -125,6 +125,7 @@ angular.module('myApp').run([
 
   return LdsApi.init({
     appId: 'TEST_ID_9e78b54c44a8746a5727c972'
+  , appVersion: '1.2.1'
   , invokeLogin: function () {
       // TODO how to properly get callback from modal?
       $rootScope.rootShowLoginModal = true;
@@ -138,7 +139,7 @@ angular.module('myApp').run([
   }).then(function (LdsApiConfig) {
     return LdsApiSession.backgroundLogin().then(function () {
       $rootScope.rootReady = true;
-      $rootScope.rootDevMode = LdsApiConfig.developerMode;
+      $rootScope.rootDeveloperMode = LdsApiConfig.developerMode;
       console.warn("TODO set UI flag with notice when in developer mode");
     });
   });

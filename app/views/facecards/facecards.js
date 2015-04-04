@@ -65,7 +65,7 @@ angular.module('facecards', ['ngRoute'])
   }, function (e) {
     console.error('[ERROR] require session');
     console.log(e);
-    $location().url('/');
+    $location.url('/');
   });
 
 
