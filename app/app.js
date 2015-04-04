@@ -3,12 +3,10 @@
 // Declare app level module which depends on views, and components
 angular.module('myApp', [
   'ngRoute',
-  'myApp.cache',
-  'myApp.api',
-  'myApp.login',
-  'myApp.session',
+  'lds.io',
   'myApp.progress',
   'myApp.splash',
+  'myApp.login',
   'facecards',
   'steve.progress'
 ])
@@ -26,14 +24,14 @@ angular.module('myApp.splash', ['ngRoute'])
   });
 }])
 .controller('RootController', [ 
-    'MyAppSession'
-  , 'LdsIoApi'
+    'LdsApiSession'
+  , 'LdsApiRequest'
   , '$location'
-  , function (MyAppSession, LdsIoApi, $location) {
+  , function (LdsApiSession, LdsApiRequest, $location) {
   //var RC = this;
 
   console.info('root controller');
-  MyAppSession.checkSession().then(function (session) {
+  LdsApiSession.checkSession().then(function (session) {
     console.info('root controller checked');
     if (session.token) {
       $location.url('/play');
@@ -53,24 +51,24 @@ angular.module('myApp.splash', ['ngRoute'])
   });
 }])
 .controller('SplashController', [ 
-    'MyAppSession'
-  , 'LdsIoApi'
+    'LdsApiSession'
+  , 'LdsApiRequest'
   , '$location'
   , '$scope'
-  , function (MyAppSession, LdsIoApi, $location, $scope) {
+  , function (LdsApiSession, LdsApiRequest, $location, $scope) {
   var SC = this;
 
-  MyAppSession.onLogin($scope, function () {
+  LdsApiSession.onLogin($scope, function () {
     $location.url('/');
   });
 
   SC.login = function (/*name*/) {
-    MyAppSession.login().then(function (session) {
+    LdsApiSession.login().then(function (session) {
       $location.url('/');
-      return LdsIoApi.profile(session);
+      return LdsApiRequest.profile(session);
     }, function (err) {
       // just in case the session is bad
-      MyAppSession.logout();
+      LdsApiSession.logout();
       window.alert("Login failed: " + err.message);
     });
   };
@@ -83,41 +81,65 @@ angular.module('myApp').controller('MyNavCtrl', [
   , '$window'
   , '$location'
   , '$http'
-  , 'MyAppSession'
-  , 'LdsIoApi'
-  , function ($scope, $timeout, $window, $location, $http, MyAppSession, LdsIoApi) {
+  , 'LdsApiSession'
+  , 'LdsApiRequest'
+  , function ($scope, $timeout, $window, $location, $http, LdsApiSession, LdsApiRequest) {
 
   var MNC = this;
 
-  MyAppSession.onLogin($scope, function (session) {
+  LdsApiSession.onLogin($scope, function (session) {
     MNC.session = session;
   });
 
-  MyAppSession.onLogout($scope, function () {
+  LdsApiSession.onLogout($scope, function () {
     MNC.session = null;
   });
 
-  MyAppSession.restore().then(function (session) {
+  LdsApiSession.restore().then(function (session) {
     MNC.session = session;
   });
 
   MNC.login = function (/*name*/) {
-    MyAppSession.login().then(function (session) {
-      return LdsIoApi.profile(session, { expire: true }).then(function () {
+    LdsApiSession.login().then(function (session) {
+      return LdsApiRequest.profile(session, { expire: true }).then(function () {
         MNC.session = MNC.session;
       });
     }, function (err) {
-      MyAppSession.logout();
+      LdsApiSession.logout();
       window.alert("Login failed: " + err.message);
     });
   };
 
   MNC.logout = function (/*name*/) {
-    MyAppSession.logout();
+    LdsApiSession.logout();
   };
 }]);
 
-angular.module('myApp').run(['MyAppSession', function (MyAppSession) {
-  MyAppSession.init('TEST_ID_9e78b54c44a8746a5727c972');
-  MyAppSession.backgroundLogin();
+angular.module('myApp').run([
+    '$rootScope'
+  , '$timeout'
+  , '$q'
+  , 'LdsApi'
+  , 'LdsApiSession'
+  , function ($rootScope, $timeout, $q, LdsApi, LdsApiSession) {
+
+  return LdsApi.init({
+    appId: 'TEST_ID_9e78b54c44a8746a5727c972'
+  , invokeLogin: function () {
+      // TODO how to properly get callback from modal?
+      $rootScope.rootShowLoginModal = true;
+      $rootScope.rootLoginDeferred = $q.defer();
+      $timeout(function () {
+        $rootScope.rootShowLoginModalFull = true;
+      }, 100);
+
+      return $rootScope.rootLoginDeferred.promise;
+    }
+  }).then(function (LdsApiConfig) {
+    return LdsApiSession.backgroundLogin().then(function () {
+      $rootScope.rootReady = true;
+      $rootScope.rootDevMode = LdsApiConfig.developerMode;
+      console.warn("TODO set UI flag with notice when in developer mode");
+    });
+  });
 }]);

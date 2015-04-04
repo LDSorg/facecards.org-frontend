@@ -16,37 +16,37 @@ angular.module('facecards', ['ngRoute'])
   '$scope'
 , '$timeout'
 , '$location'
-, 'MyAppSession'
+, 'LdsApiSession'
 , 'StProgress'
-, 'LdsIoApi'
-, function ($scope, $timeout, $location, MyAppSession, StProgress, LdsIoApi) {
+, 'LdsApiRequest'
+, function ($scope, $timeout, $location, LdsApiSession, StProgress, LdsApiRequest) {
   var FC = this;
   var scope = this;
   var shuffle = window.knuthShuffle;
-  var mine;
+  //var mine;
   var cardCache = {};
 
-  MyAppSession.onLogout($scope, function () {
+  LdsApiSession.onLogout($scope, function () {
     StProgress.stop(0);
     $location.url('/');
   });
 
-  MyAppSession.requireSession().then(function (session) {
+  LdsApiSession.requireSession().then(function (session) {
     $location.url('/play');
 
     FC.flashMessage = "Downloading Ward / Stake info...";
     StProgress.start(4 * 1000);
-    return LdsIoApi.profile(session).then(function (profile) {
+    return LdsApiRequest.profile(session).then(function (profile) {
       FC.flashMessage = "Downloading Ward directory...";
       StProgress.restart(6 * 1000, { style: "success" });
-      return LdsIoApi.ward(
+      return LdsApiRequest.ward(
         session
       , profile.home_stake_app_scoped_id || profile.home_stake_id
       , profile.home_ward_app_scoped_id || profile.home_ward_id 
       ).then(function (/*ward*/) {
         FC.flashMessage = "Downloading Photo directory...";
         StProgress.restart(10 * 1000, { style: "warning" });
-        return LdsIoApi.wardPhotos(
+        return LdsApiRequest.wardPhotos(
           session
         , profile.home_stake_app_scoped_id || profile.home_stake_id
         , profile.home_ward_app_scoped_id || profile.home_ward_id 
@@ -75,14 +75,14 @@ angular.module('facecards', ['ngRoute'])
   //
   function startGame() {
     // TODO select stake and ward
-    MyAppSession.requireSession().then(function (session) {
-      return LdsIoApi.profile(session).then(function (profile) {
-        return LdsIoApi.ward(
+    LdsApiSession.requireSession().then(function (session) {
+      return LdsApiRequest.profile(session).then(function (profile) {
+        return LdsApiRequest.ward(
           session
         , profile.home_stake_app_scoped_id || profile.home_stake_id
         , profile.home_ward_app_scoped_id || profile.home_ward_id 
         ).then(function (ward) {
-          return LdsIoApi.wardPhotos(
+          return LdsApiRequest.wardPhotos(
             session
           , profile.home_stake_app_scoped_id || profile.home_stake_id
           , profile.home_ward_app_scoped_id || profile.home_ward_id 
@@ -107,7 +107,7 @@ angular.module('facecards', ['ngRoute'])
 
               // TODO check updated but deleted and flag in server api
               if (photo && photo.updated_at) {
-                m.photoUrl = LdsIoApi.photoUrl(session, photo, 'medium', photo.type);
+                m.photoUrl = LdsApiRequest.photoUrl(session, photo, 'medium', photo.type);
               }
             });
 
@@ -119,7 +119,7 @@ angular.module('facecards', ['ngRoute'])
               , photo: m.photoUrl
               , name: m.name + ' ' + m.surnames.join(' ')
               , callings: m.callings
-              , gender: LdsIoApi.guessGender(m)
+              , gender: LdsApiRequest.guessGender(m)
               , attempts: 0
               };
             });
@@ -193,7 +193,7 @@ angular.module('facecards', ['ngRoute'])
   }
 
   function nextCard() {
-    var card = scope.goodCards[0];
+    //var card = scope.goodCards[0];
     var id = scope.goodCards[0].id;
 
     // always be preloading the next 6 cards
@@ -267,6 +267,7 @@ angular.module('facecards', ['ngRoute'])
     }
   }
 
+  /*
   scope.shareOnFacebook = function () {
     var score = ((scope.hitCount / (scope.hitCount + scope.missCount)) * 100).toFixed(0)
       ;
@@ -289,6 +290,7 @@ angular.module('facecards', ['ngRoute'])
       }
     );
   };
+  */
 
   scope.playAgain = function () {
     scope.hits = {};

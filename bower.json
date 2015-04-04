@@ -11,6 +11,8 @@
     "angular-loader": "1.2.x",
     "angular-mocks": "~1.2.x",
     "html5-boilerplate": "~4.3.0",
-    "angular-lds-connect": "~0.5.4"
+    "oauth3": "1.0.0-pre",
+    "angular-lds-io": "1.0.0-pre",
+    "knuth-shuffle": "~1.0.1"
   }
 }

@@ -5,8 +5,8 @@ angular
   .controller('MyLoginCtrl', [
     '$rootScope'
   , '$timeout'
-  , 'MyAppSession'
-  , function MyLoginCtrl($rootScope, $timeout, MyAppSession) {
+  , 'LdsApiSession'
+  , function MyLoginCtrl($rootScope, $timeout, LdsApiSession) {
     var MLC = this;
 
     function hide() {
@@ -18,7 +18,7 @@ angular
     }
 
     MLC.login = function () {
-      MyAppSession.login().then(function (session) {
+      LdsApiSession.login().then(function (session) {
         $rootScope.rootLoginDeferred.resolve(session);
       }, function (err) {
         $rootScope.rootLoginDeferred.reject(err);
