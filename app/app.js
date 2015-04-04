@@ -140,7 +140,6 @@ angular.module('myApp').run([
     return LdsApiSession.backgroundLogin().then(function () {
       $rootScope.rootReady = true;
       $rootScope.rootDeveloperMode = LdsApiConfig.developerMode;
-      console.warn("TODO set UI flag with notice when in developer mode");
     });
   });
 }]);
